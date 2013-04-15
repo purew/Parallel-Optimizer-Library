@@ -83,7 +83,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classOptimizationWorker-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">OptimizationWorker Class Reference</div>  </div>
@@ -97,8 +96,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa0207b420866be9e932a72dc3a7344f0"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#aa0207b420866be9e932a72dc3a7344f0">fitnessFunction</a> ()=0</td></tr>
-<tr class="memdesc:aa0207b420866be9e932a72dc3a7344f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitness function used for evaluating parameters.  <a href="#aa0207b420866be9e932a72dc3a7344f0"></a><br/></td></tr>
+<tr class="memitem:a04c819c408a23fcdadc1c96711f5aa58"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#a04c819c408a23fcdadc1c96711f5aa58">fitnessFunction</a> (<a class="el" href="classParameters.html">Parameters</a> &amp;parameters)=0</td></tr>
+<tr class="memdesc:a04c819c408a23fcdadc1c96711f5aa58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fitness function used for evaluating parameters.  <a href="#a04c819c408a23fcdadc1c96711f5aa58"></a><br/></td></tr>
 <tr class="memitem:ac6ae5b10be6a60a49f98e63e68dbe8a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#ac6ae5b10be6a60a49f98e63e68dbe8a5">OptimizationWorker</a> ()</td></tr>
 <tr class="memdesc:ac6ae5b10be6a60a49f98e63e68dbe8a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor is executed once per worker and should be used for preprocessing and initializing data.  <a href="#ac6ae5b10be6a60a49f98e63e68dbe8a5"></a><br/></td></tr>
 <tr class="memitem:aa10f41e10d69b4919ca822627772e407"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#aa10f41e10d69b4919ca822627772e407">setMaster</a> (<a class="el" href="classMasterOptimizer.html">MasterOptimizer</a> *master)</td></tr>
@@ -114,12 +113,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a0876bf2a3790bd6e0c804d1e9218aa9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save current parameters to file.  <a href="#a0876bf2a3790bd6e0c804d1e9218aa9e"></a><br/></td></tr>
 <tr class="memitem:ad865deaac2285ada2ece455121e54511"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#ad865deaac2285ada2ece455121e54511">readOptimizationParameters</a> (std::string filename=std::string(LAST_OPTIMIZED_PARAMETERS_FILENAME))</td></tr>
 <tr class="memdesc:ad865deaac2285ada2ece455121e54511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load current parameters from file.  <a href="#ad865deaac2285ada2ece455121e54511"></a><br/></td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a2033a442044310b3beb8cb7005d45456"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2033a442044310b3beb8cb7005d45456"></a>
-<a class="el" href="classOptimizationParameters.html">OptimizationParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#a2033a442044310b3beb8cb7005d45456">optParams</a></td></tr>
-<tr class="memdesc:a2033a442044310b3beb8cb7005d45456"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains the parameters being optimized with regards to fitnessFunction. <br/></td></tr>
+<tr class="memitem:a986301909acdea14917f62cbb84b9499"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a986301909acdea14917f62cbb84b9499"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#a986301909acdea14917f62cbb84b9499">setParameters</a> (<a class="el" href="classParameters.html">Parameters</a> &amp;parameters)</td></tr>
+<tr class="memdesc:a986301909acdea14917f62cbb84b9499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set current parameters. <br/></td></tr>
+<tr class="memitem:ada90aa36e794a4a121187224a71d6a1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada90aa36e794a4a121187224a71d6a1f"></a>
+const <a class="el" href="classParameters.html">Parameters</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#ada90aa36e794a4a121187224a71d6a1f">getParameters</a> ()</td></tr>
+<tr class="memdesc:ada90aa36e794a4a121187224a71d6a1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current parameters. <br/></td></tr>
+<tr class="memitem:ae7923efc2db3cf045d08fd4d40a917d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7923efc2db3cf045d08fd4d40a917d5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#ae7923efc2db3cf045d08fd4d40a917d5">setParameterBounds</a> (<a class="el" href="classParameterBounds.html">ParameterBounds</a> parameterBounds)</td></tr>
+<tr class="memdesc:ae7923efc2db3cf045d08fd4d40a917d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set current parameter bounds. <br/></td></tr>
+<tr class="memitem:a1bbbb25bc45f3cd96e82a1fcb684cc8d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1bbbb25bc45f3cd96e82a1fcb684cc8d"></a>
+const <a class="el" href="classParameterBounds.html">ParameterBounds</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOptimizationWorker.html#a1bbbb25bc45f3cd96e82a1fcb684cc8d">getParameterBounds</a> ()</td></tr>
+<tr class="memdesc:a1bbbb25bc45f3cd96e82a1fcb684cc8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current parameter bounds. <br/></td></tr>
 </table>
 <a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Classes wishing to be optimized need to inherit this class. </p>
@@ -169,7 +174,7 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa0207b420866be9e932a72dc3a7344f0"></a>
+<a class="anchor" id="a04c819c408a23fcdadc1c96711f5aa58"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -179,7 +184,8 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual double OptimizationWorker::fitnessFunction </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classParameters.html">Parameters</a> &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -192,6 +198,12 @@ Public Attributes</h2></td></tr>
 
 <p>Fitness function used for evaluating parameters. </p>
 <p>A higher value is better. Derived classes need to implement fitnessFunction. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>Contains parameters used in fitness function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -303,7 +315,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 21:29:10 for Optimizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 15 2013 21:44:07 for Optimizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

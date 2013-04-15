@@ -19,10 +19,10 @@ How to use
 ==========
 
 OptimizationWorker is the entity testing a particular solution. 
-Therefore, derive your own class from that one taking care to 
-set up your problem in it's constructor and to calculate your 
+Therefore, derive your own class from that one, taking care to
+set up your problem in its constructor and to calculate your
 fitness-function in OptimizationWorker.fitnessFunction using 
-the parameters in OptimizationWorker.optParams.
+the parameters from OptimizationWorker.getParameters().
 
 Choose an appropriate MasterOptimizer, for example the ParticleSwarmOptimizer,
 and call its MasterOptimizer.optimize() to start the search for a solution.

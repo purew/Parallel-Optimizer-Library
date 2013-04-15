@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>It is implemented using C++ and pthreads and is POSIX-compliant. My plans are to also implement OpenMPI which would make this library far more useful for computer clusters.</p>
 <p>It is evolving and the API should not be considered final in any way yet. However, I have been using this library for my own application since early 2012 and I am so far confident in the library's function.</p>
 <h1>How to use</h1>
-<p><a class="el" href="classOptimizationWorker.html" title="Classes wishing to be optimized need to inherit this class.">OptimizationWorker</a> is the entity testing a particular solution. Therefore, derive your own class from that one taking care to set up your problem in it's constructor and to calculate your fitness-function in <a class="el" href="classOptimizationWorker.html#aa0207b420866be9e932a72dc3a7344f0" title="Fitness function used for evaluating parameters.">OptimizationWorker.fitnessFunction</a> using the parameters in <a class="el" href="classOptimizationWorker.html#a2033a442044310b3beb8cb7005d45456" title="Contains the parameters being optimized with regards to fitnessFunction.">OptimizationWorker.optParams</a>.</p>
+<p><a class="el" href="classOptimizationWorker.html" title="Classes wishing to be optimized need to inherit this class.">OptimizationWorker</a> is the entity testing a particular solution. Therefore, derive your own class from that one, taking care to set up your problem in its constructor and to calculate your fitness-function in <a class="el" href="classOptimizationWorker.html#a04c819c408a23fcdadc1c96711f5aa58" title="Fitness function used for evaluating parameters.">OptimizationWorker.fitnessFunction</a> using the parameters from <a class="el" href="classOptimizationWorker.html#ada90aa36e794a4a121187224a71d6a1f" title="Get current parameters.">OptimizationWorker.getParameters()</a>.</p>
 <p>Choose an appropriate <a class="el" href="classMasterOptimizer.html" title="Entity responsible for setting up worker-threads and dividing work among them.">MasterOptimizer</a>, for example the <a class="el" href="classParticleSwarmOptimizer.html" title="Implements the Particle Swarm Optimization for finding parameter-sets that achieve good results in th...">ParticleSwarmOptimizer</a>, and call its <a class="el" href="classMasterOptimizer.html#ab3252d54046191406ea758bdee22e758" title="Start optimization.">MasterOptimizer.optimize()</a> to start the search for a solution.</p>
 <p>When done, retrieve best solution with <a class="el" href="classMasterOptimizer.html#a6779be6c292e791a9f4400fbb02da770" title="Returns the best solution found so far.">MasterOptimizer.getBestParameters()</a>.</p>
 <h1>LICENSE</h1>
@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 21:29:10 for Optimizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 15 2013 21:44:07 for Optimizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>
