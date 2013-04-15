@@ -76,16 +76,6 @@ const int ProgressUpdates = 100;
 // Forward declaration
 class MasterOptimizer;
 
-/** Structure holding parameters and their corresponding fitness-value*/
-class OptimizationData
-{
-public:
-	std::vector<double> params; ///< Parameters used in simulation.
-	double fitnessValue;		///< Fitness-value associated with parameters.
-};
-
-
-
 
 /*****************************************************************
  *
@@ -94,31 +84,34 @@ public:
  *****************************************************************/
 
 /** Class for handling parameters used in optimization. */
-class OptimizationParameters
+class ParameterBounds
 {
 public:
-	OptimizationParameters() {};
-	~OptimizationParameters() {};
+	ParameterBounds() {};
+	~ParameterBounds() {};
 
 	/** For a new object, register its parameters with registerOptParam. */
-	void registerParameter( double param, double min, double max );
+	void registerParameter( double min, double max );
 	/** Returns number of parameters in use */
-	int size() {return params.size();};
+	int size() {return max.size();};
 
-	/** When requesting a change in parameters, store the new ones in stagingParameters.
-	 * 	Make them go live with putStagingParametersLive(). */
-	//std::vector<double> stagingParameters;
-
-	/** New parameters in stagingParameters go live. */
-	//void putStagingParametersLive();
-
-	std::vector<double> params;
 	std::vector<double> max;
 	std::vector<double> min;
 
 private:
+};
 
+class Parameters : public std::vector<double>
+{
 
+};
+
+/** Structure holding parameters and their corresponding fitness-value*/
+class OptimizationData
+{
+public:
+	Parameters parameters; ///< Parameters used in simulation.
+	double fitnessValue;		///< Fitness-value associated with parameters.
 };
 
 
@@ -135,14 +128,15 @@ class OptimizationWorker
 public:
 	/** Fitness function used for evaluating parameters.
 	 *  A higher value is better. Derived classes need to implement
-	 *  fitnessFunction. */
-	virtual double fitnessFunction() = 0;
+	 *  fitnessFunction.
+	 *  \param parameters Contains parameters used in fitness function. */
+	virtual double fitnessFunction(Parameters &parameters) = 0;
 
 	/** Constructor is executed once per worker and should be
 	 * 	used for preprocessing and initializing data.
 	 * 	Each worker lives in it's own thread.
 	 */
-	OptimizationWorker() {;};
+	OptimizationWorker() {};
 	virtual ~OptimizationWorker() {};
 
 	/** Sets a MasterOptimizer for this worker.
@@ -156,8 +150,6 @@ public:
 	/** Creates a new thread and tries to acquire access to input data from masterOptimizer */
 	void startWorker();
 
-	OptimizationParameters optParams; //!< Contains the parameters being optimized with regards to fitnessFunction
-
 	/** Thread does work in this function until all work is done.
 	 * Responsible for locking/getting input data, starting simulation, and locking/saving output. */
 	void doWork();
@@ -169,7 +161,19 @@ public:
 	 * @param filename Load parameters from this place */
 	void readOptimizationParameters( std::string filename = std::string(LAST_OPTIMIZED_PARAMETERS_FILENAME) );
 
+	/** Set current parameters */
+	void setParameters( Parameters& parameters ) {this->parameters = parameters;};
+	/** Get current parameters */
+	const Parameters& getParameters() {return parameters;};
+	/** Set current parameter bounds */
+	void setParameterBounds( ParameterBounds parameterBounds ) {this->parameterBounds=parameterBounds;};
+	/** Get current parameter bounds */
+	const ParameterBounds& getParameterBounds() {return parameterBounds;};
+
 private:
+
+	Parameters parameters;
+	ParameterBounds parameterBounds;
 
 	MasterOptimizer* master;
 	pthread_t thread;
@@ -242,7 +246,7 @@ protected:
 	unsigned threadCount;
 	unsigned chunkSize;	//<! Size of chunk grabbed by fetchChunkOfIndata
 	OptimizationWorker* originalWorker;
-	OptimizationParameters* paramBounds;
+	ParameterBounds* paramBounds;
 
 	OptimizationData bestParameters;
 

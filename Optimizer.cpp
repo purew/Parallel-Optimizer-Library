@@ -39,25 +39,11 @@
  *****************************************************************/
 
 
-void OptimizationParameters::registerParameter( double _param, double _min, double _max )
+void ParameterBounds::registerParameter( double _min, double _max )
 {
-	params.push_back( _param );
 	min.push_back( _min );
 	max.push_back( _max );
 }
-
-/*void OptimizationParameters::putStagingParametersLive()
-{
-	if (stagingParameters.size() != optParams.size())
-	{
-		std::cerr << "ERROR: stagingParameters.size()="<<stagingParameters.size()<<" different from optParams.size()="<<optParams.size()<<std::endl;
-		throw myException("Error in putStagingParametersLive()");
-	}
-	for (int i=0; i < optParams.size(); ++i)
-	{
-		*optParams[i] = stagingParameters[i];
-	}
-}*/
 
 
 /*****************************************************************
@@ -94,10 +80,10 @@ void OptimizationWorker::doWork()
 
 			for (unsigned i=0; i < dataList.size(); ++i)
 			{
-				optParams.params = dataList[i]->params;
+				parameters = dataList[i]->parameters;
 
 				// Run simulation
-				double result = fitnessFunction();
+				double result = fitnessFunction(parameters);
 
 				// Save fitness value
 				dataList[i]->fitnessValue = result;
@@ -129,11 +115,11 @@ void OptimizationWorker::saveOptimizationParameters( std::string filename )
 		WARN("Saving to "<<filename)
 
 	// First write a number specifying number of parameters being saved
-	fout << optParams.params.size() << std::endl;
+	fout << parameters.size() << std::endl;
 
-	for (unsigned i=0; i<optParams.params.size(); ++i)
+	for (unsigned i=0; i<parameters.size(); ++i)
 	{
-		fout << optParams.params[i] << "\t"<< optParams.min[i] <<"\t"<<  optParams.max[i]<<std::endl;
+		fout << parameters[i] << "\t"<< parameterBounds.min[i] <<"\t"<<  parameterBounds.max[i]<<std::endl;
 	}
 	fout.close();
 }
@@ -151,13 +137,13 @@ void OptimizationWorker::readOptimizationParameters( std::string filename )
 	fin >> dim;
 
 	// Resize parameter vectors
-	optParams.params.resize(dim, 0);
-	optParams.min.resize(dim, 0);
-	optParams.max.resize(dim, 0);
+	parameters.resize(dim, 0);
+	parameterBounds.min.resize(dim, 0);
+	parameterBounds.max.resize(dim, 0);
 
 	for (unsigned i=0; i<dim; ++i)
 	{
-		fin >> optParams.params[i] >> optParams.min[i] >> optParams.max[i];
+		fin >> parameters[i] >> parameterBounds.min[i] >> parameterBounds.max[i];
 	}
 }
 
@@ -187,7 +173,7 @@ void MasterOptimizer::optimizeRandomSearch()
 		for (int i=0;i<steps; ++i)
 		{
 			OptimizationData s;
-			s.params.clear();
+			s.parameters.clear();
 
 			for (int param=0; param<params; ++param)
 			{
@@ -195,7 +181,7 @@ void MasterOptimizer::optimizeRandomSearch()
 				double min = paramBounds->min[param];
 				double max = paramBounds->max[param];
 				double newVal = ((rand()%1000)/1000.0) * (max-min)+min;
-				s.params.push_back( newVal );
+				s.parameters.push_back( newVal );
 			}
 
 			allTestableSolutions.push_back(s);
@@ -233,8 +219,8 @@ void MasterOptimizer::optimizeRandomSearch()
 		}
 	}
 
-	for (unsigned i=0; i<bestParameters.params.size();++i)
-		std::cout << bestParameters.params[i] << " ";
+	for (unsigned i=0; i<bestParameters.parameters.size();++i)
+		std::cout << bestParameters.parameters[i] << " ";
 	std::cout <<std::endl;
 }
 
@@ -256,7 +242,7 @@ void MasterOptimizer::optimizeBruteforce()
 	// Set up the first solution
 	OptimizationData firstSolution;
 	for (int i=0; i<params; ++i)
-		firstSolution.params.push_back( paramBounds->min.at(i) );
+		firstSolution.parameters.push_back( paramBounds->min.at(i) );
 	allTestableSolutions.push_back(firstSolution);
 
 	int i=0;
@@ -269,7 +255,7 @@ void MasterOptimizer::optimizeBruteforce()
 			min = paramBounds->min[param];
 			max = paramBounds->max[param];
 
-			allTestableSolutions[i].params[param] = newVal;
+			allTestableSolutions[i].parameters[param] = newVal;
 
 
 			//std::cout << "i="<<i<<", newVal="<<newVal<<", param="<<param<<std::endl;
@@ -282,7 +268,7 @@ void MasterOptimizer::optimizeBruteforce()
 			// Use the previous solution as template
 			allTestableSolutions.push_back( allTestableSolutions[i-1] );
 
-			newVal = allTestableSolutions[i].params[param] + (max-min)/(steps-2);
+			newVal = allTestableSolutions[i].parameters[param] + (max-min)/(steps-2);
 		} while (newVal<max);
 	}
 
@@ -310,7 +296,7 @@ void MasterOptimizer::optimizeBruteforce()
 		if ( (*it).fitnessValue > bestParameters.fitnessValue )
 		{
 			bestParameters = *it;
-			std::cout << "Best parameter was " << bestParameters.params[0] << std::endl;
+			std::cout << "Best parameter was " << bestParameters.parameters[0] << std::endl;
 		}
 	}
 }
@@ -365,13 +351,13 @@ void MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess )
 	} while (processedItems < itemsToProcess);
 }
 
-MasterOptimizer::MasterOptimizer( OptimizationWorker* _originalWorker, int _maxThreads )
+MasterOptimizer::MasterOptimizer( OptimizationWorker* originalWorker, int maxThreads )
 {
-	originalWorker = _originalWorker;
+	this->originalWorker = originalWorker;
 	chunkSize = 1;
-	paramBounds = &(originalWorker->optParams);
+	ParameterBounds parameterBounds = originalWorker->getParameterBounds();
 	if (paramBounds->size()<=0)
-		ERROR("paramBounds->size<=0 : "<<paramBounds->size());
+		ERROR("Please set appropriate parameter-bounds.\nParameterBounds->size<=0");
 
 	int ret;
 	ret = pthread_mutex_init( &indataMutex, 0);
@@ -388,8 +374,8 @@ MasterOptimizer::MasterOptimizer( OptimizationWorker* _originalWorker, int _maxT
 			ERROR("Problem with condition variable: "<<strerror(errno));
 
 	// Find number of cores
-	if (_maxThreads>0)
-		threadCount = _maxThreads;
+	if (maxThreads>0)
+		threadCount = maxThreads;
 	else
 		threadCount =  sysconf( _SC_NPROCESSORS_ONLN );
 
@@ -399,6 +385,7 @@ MasterOptimizer::MasterOptimizer( OptimizationWorker* _originalWorker, int _maxT
 	for (unsigned i=0; i<threadCount; ++i)
 	{
 		OptimizationWorker* newWorker = originalWorker->getNewWorker();
+		newWorker->setParameterBounds( parameterBounds );
 		newWorker->setMaster(this);
 		workers.push_back(newWorker);
 		newWorker->startWorker();

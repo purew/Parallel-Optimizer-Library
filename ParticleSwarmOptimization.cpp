@@ -51,7 +51,7 @@ void ParticleSwarmOptimizer::optimize()
 			double min = paramBounds->min[param];
 			double max = paramBounds->max[param];
 			double newVal = random(min, max);
-			particle.x.params.push_back( newVal );
+			particle.x.parameters.push_back( newVal );
 
 			// Set up initial velocity
 			newVal = random(0,1)/100 * (max-min)+min;
@@ -155,23 +155,23 @@ void ParticleSwarmOptimizer::optimize()
 				{
 				case NeighborhoodBest:
 					allParticles[i].v[j] = allParticles[i].v[j]*inertia
-						+ c1*random(0,1)*(allParticles[i].p.params[j]-allParticles[i].x.params[j])
-						+ c2*random(0,1)*(allParticles[i].l->params[j]-allParticles[i].x.params[j]);
+						+ c1*random(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
+						+ c2*random(0,1)*(allParticles[i].l->parameters[j]-allParticles[i].x.parameters[j]);
 					break;
 				case PopulationBest:
 					allParticles[i].v[j] = allParticles[i].v[j]*inertia
-						+ c1*random(0,1)*(allParticles[i].p.params[j]-allParticles[i].x.params[j])
-						+ c2*random(0,1)*(bestParameters.params[j]-allParticles[i].x.params[j]);
+						+ c1*random(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
+						+ c2*random(0,1)*(bestParameters.parameters[j]-allParticles[i].x.parameters[j]);
 					break;
 				}
 
-				double newPos = allParticles[i].x.params[j] + allParticles[i].v[j];
+				double newPos = allParticles[i].x.parameters[j] + allParticles[i].v[j];
 				if (newPos < paramBounds->min[j])
 					newPos = paramBounds->min[j];
 				if (newPos > paramBounds->max[j])
 					newPos = paramBounds->max[j];
 
-				allParticles[i].x.params[j] = newPos;
+				allParticles[i].x.parameters[j] = newPos;
 			}
 		}
 
