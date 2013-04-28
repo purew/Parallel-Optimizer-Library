@@ -14,13 +14,14 @@
 #include <limits>
 #include <fstream>
 #include <ctime>
+#include <vector>
 
 #include "ParticleSwarmOptimization.h"
 
 
 
 
-void ParticleSwarmOptimizer::optimize()
+void PAO::ParticleSwarmOptimizer::optimize()
 {
 	double inertia=1;
 
@@ -50,14 +51,14 @@ void ParticleSwarmOptimizer::optimize()
 			// Set up initial position
 			double min = paramBounds->min[param];
 			double max = paramBounds->max[param];
-			double newVal = random(min, max);
+			double newVal = randomBetween(min, max);
 			particle.x.parameters.push_back( newVal );
 
 			// Set up initial velocity
-			newVal = random(0,1)/100 * (max-min)+min;
+			newVal = randomBetween(0,1)/100 * (max-min)+min;
 			particle.v.push_back( newVal );
 		}
-		particle.x.fitnessValue =  -std::numeric_limits<double>::max();
+		particle.x.fitnessValue =  std::numeric_limits<double>::max();
 		particle.p = particle.x;
 
 		allParticles.push_back(particle);
@@ -76,7 +77,7 @@ void ParticleSwarmOptimizer::optimize()
 	else if (chunkSize==0)
 		chunkSize+=1;
 
-	bestParameters.fitnessValue = -std::numeric_limits<double>::max();
+	bestParameters.fitnessValue = std::numeric_limits<double>::max();
 	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
 
 	timespec clockStarted;
@@ -85,7 +86,7 @@ void ParticleSwarmOptimizer::optimize()
 	// Start main swarm loop
 	for (unsigned i=0; i<pso.generations;++i)
 	{
-		if ((pso.generations<ProgressUpdates || i%(int)(pso.generations/(float)ProgressUpdates)==0) && i>0)
+		/*if ((pso.generations<ProgressUpdates || i%(int)(pso.generations/(float)ProgressUpdates)==0) && i>0)
 		{
 			std::cout << "Starting generation "<<i<<" with inertia "<<inertia<<".\t";
 			struct timespec ts,td;
@@ -95,7 +96,7 @@ void ParticleSwarmOptimizer::optimize()
 			double timeLeft = t/i*(pso.generations-i);
 			std::cout << "Time left: "<< (int)timeLeft/60 <<" min and "<<(int)timeLeft%60<<" seconds\n";
 			std::cout.flush();
-		}
+		}*/
 
 		unlockIndata();
 
@@ -107,13 +108,13 @@ void ParticleSwarmOptimizer::optimize()
 		for (unsigned i=0; i < allParticles.size(); ++i)
 		{
 			// Update particle's best location
-			if (allParticles[i].x.fitnessValue > allParticles[i].p.fitnessValue )
+			if (allParticles[i].x.fitnessValue < allParticles[i].p.fitnessValue )
 			{
 				allParticles[i].p = allParticles[i].x;
 			}
 
 			// Update population best location
-			if ( allParticles[i].x.fitnessValue > bestParameters.fitnessValue )
+			if ( allParticles[i].x.fitnessValue < bestParameters.fitnessValue )
 			{
 				bestParameters = allParticles[i].x;
 				std::cout << "Best fitness value "<<bestParameters.fitnessValue<< std::endl;
@@ -129,13 +130,13 @@ void ParticleSwarmOptimizer::optimize()
 				// Use ring topology
 				unsigned prev = (i-1+allParticles.size())%allParticles.size();
 				unsigned next = (i+1+allParticles.size())%allParticles.size();
-				if ( allParticles[next].p.fitnessValue > allParticles[i].p.fitnessValue )
+				if ( allParticles[next].p.fitnessValue < allParticles[i].p.fitnessValue )
 				{
 					allParticles[i].l = &(allParticles[next].p);
 					//std::cout << "Particle "<<i<<" found new neighborhood max "<<allParticles[i].l->fitnessValue <<std::endl;
 					//std::cout.flush();
 				}
-				if ( allParticles[prev].p.fitnessValue > allParticles[i].p.fitnessValue )
+				if ( allParticles[prev].p.fitnessValue < allParticles[i].p.fitnessValue )
 				{
 					allParticles[i].l = &(allParticles[prev].p);
 					//std::cout << "Particle "<<i<<" found new neighborhood max "<<allParticles[i].l->fitnessValue <<std::endl;
@@ -155,13 +156,13 @@ void ParticleSwarmOptimizer::optimize()
 				{
 				case NeighborhoodBest:
 					allParticles[i].v[j] = allParticles[i].v[j]*inertia
-						+ c1*random(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
-						+ c2*random(0,1)*(allParticles[i].l->parameters[j]-allParticles[i].x.parameters[j]);
+						+ c1*randomBetween(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
+						+ c2*randomBetween(0,1)*(allParticles[i].l->parameters[j]-allParticles[i].x.parameters[j]);
 					break;
 				case PopulationBest:
 					allParticles[i].v[j] = allParticles[i].v[j]*inertia
-						+ c1*random(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
-						+ c2*random(0,1)*(bestParameters.parameters[j]-allParticles[i].x.parameters[j]);
+						+ c1*randomBetween(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
+						+ c2*randomBetween(0,1)*(bestParameters.parameters[j]-allParticles[i].x.parameters[j]);
 					break;
 				}
 
@@ -183,21 +184,21 @@ void ParticleSwarmOptimizer::optimize()
 
 		// Lower inertia for next generation
 		inertia -= 0.7/pso.generations;
-		if (globals.csignal_sig>0)
-			break;
 	}
 }
 
 
 
-ParticleSwarmOptimizer::ParticleSwarmOptimizer( PSOParameters parameters,OptimizationWorker* originalWorker, int _maxThreads  )
- : MasterOptimizer( originalWorker, _maxThreads )
+PAO::ParticleSwarmOptimizer::ParticleSwarmOptimizer( 
+	std::vector<PAO::OptimizationWorker*> workers, 
+	PAO::PSOParameters parameters 
+	)
+ : MasterOptimizer( workers )
 {
 	pso = parameters;
-
 }
 
-ParticleSwarmOptimizer::~ParticleSwarmOptimizer()
+PAO::ParticleSwarmOptimizer::~ParticleSwarmOptimizer()
 {
 
 }

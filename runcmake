@@ -1,0 +1,55 @@
+#!/bin/bash
+# Call CMake to build the project
+
+case "$1" in
+	"debug" | "Debug" )
+			BUILD=Debug ;;
+	"release" | "Release" )
+			BUILD=Release ;;
+	"clean" )
+			rm -R Release
+			rm -R Debug
+			exit 0 ;;	
+	* )
+		echo "Build either release, debug, or clean"
+		exit 0 ;;
+esac
+
+
+# Choose build system
+if which ninja
+then BUILD_SYSTEM=Ninja
+else
+BUILD_SYSTEM="Unix Makefiles"
+fi	
+
+# Build command depending on build system
+function build {
+	if [ "$BUILD_SYSTEM" == "Ninja" ];
+	then 
+		echo "Building with $BUILD_SYSTEM"
+		ninja
+	else
+		make $2
+	fi	
+}
+
+
+DIR=`pwd`
+
+mkdir -p ${BUILD}
+cd ${BUILD}
+echo "*** Executing CMake ***"
+cmake -G "$BUILD_SYSTEM" -DCMAKE_BUILD_TYPE=$BUILD ..
+echo "***     Building    ***"
+build $2
+
+if [ "$?" != 0 ]
+then 
+	exit 1
+fi
+
+
+
+
+

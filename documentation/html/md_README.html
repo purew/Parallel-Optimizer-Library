@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Optimizer: Main Page</title>
+<title>Optimizer: Introduction</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,8 +37,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -57,7 +57,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -72,12 +71,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+</div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">Optimizer Documentation</div>  </div>
+<div class="title">Introduction </div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><p>Parallel Optimizer Library was created when I found myself needing a way of finding solutions to a multi-dimensional problem where exhaustive search is impossible due to the large search-space. Essentially, the library tries to quicken the process of finding X that maximizes f(X) by implementing multithreaded stocastic optimization methods such as particle swarm optimization.</p>
+<p>It is implemented using C++ and pthreads and has no additional dependencies. My plans are to also implement MPI which would make this library far more useful for computer clusters.</p>
+<p>It is evolving and the API should not be considered final in any way yet. However, I have been using this library for my own application since early 2012 and I am so far confident in the library's function.</p>
+<h1>How to use</h1>
+<p>OptimizationWorker is the entity testing a particular solution. Therefore, derive your own class from that one taking care to set up your problem in it's constructor and to calculate your fitness-function in OptimizationWorker.fitnessFunction using the parameters in OptimizationWorker.optParams.</p>
+<p>Choose an appropriate MasterOptimizer, for example the ParticleSwarmOptimizer, and call its MasterOptimizer.optimize() to start the search for a solution.</p>
+<p>When done, retrieve best solution with MasterOptimizer.getBestParameters().</p>
+<h1>LICENSE</h1>
+<p>The MIT License (MIT)</p>
+<p>Copyright (c) 2013 Anders Bennehag </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated on Sun Apr 28 2013 20:48:47 for Optimizer by &#160;<a href="http://www.doxygen.org/index.html">
