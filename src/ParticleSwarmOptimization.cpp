@@ -21,7 +21,7 @@
 
 
 
-void PAO::ParticleSwarmOptimizer::optimize()
+double PAO::ParticleSwarmOptimizer::optimize()
 {
 	double inertia=1;
 
@@ -185,6 +185,7 @@ void PAO::ParticleSwarmOptimizer::optimize()
 		// Lower inertia for next generation
 		inertia -= 0.7/pso.generations;
 	}
+	return bestParameters.fitnessValue;
 }
 
 

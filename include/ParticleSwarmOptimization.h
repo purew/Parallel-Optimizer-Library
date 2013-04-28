@@ -85,7 +85,7 @@ namespace PAO
 			
 		virtual ~ParticleSwarmOptimizer();
 
-		void optimize();
+		double optimize();
 
 	private:
 		PSOParameters pso;

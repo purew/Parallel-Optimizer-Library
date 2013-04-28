@@ -3,13 +3,26 @@
 #include "Optimizer.h"
 #include "ParticleSwarmOptimization.h"
 
+
+// For this example, we would like to minimize the Rosenbrock function.
+// A class Rosenbrock is created to contain the details of our problem.
+// The Rosenbrock class inherits PAO::OptimizationWorker which adds 
+// the parallell processing capabilities.
+
 class Rosenbrock : public PAO::OptimizationWorker
 {
 public:
 	Rosenbrock();
+	
+	// PAO::OptimizationWorker requires the fitnessFunction method
+	// to be implemented. This function should implement our F(X) 
+	// and return the value of said function.
 	double fitnessFunction (PAO::Parameters &parameters);
 
 private:
+	// Other than implementing fitnessFunction and supplying
+	// parameter-bounds as seen below, there are no other requirements.
+	
 	const int Dimensions=3; // Dimensions of search-space
 	const double L=100; // Length of dimension searched
 };
@@ -23,6 +36,8 @@ double Rosenbrock::fitnessFunction(PAO::Parameters &X)
 	return sum;
 }
 
+// In the constructor we use setParameterBounds to describe the
+// parameter-space we would like to search:
 Rosenbrock::Rosenbrock()
 {
 	PAO::ParameterBounds b;
@@ -45,13 +60,18 @@ int main()
 		workers.push_back( (PAO::OptimizationWorker*) w );		
 	}
 	
+	// Here we specify som parameters for the particle swarm
+	// optimization algorithm.
 	PAO::PSOParameters psoparams;
 	psoparams.generations = 200;
 	psoparams.variant = PAO::NeighborhoodBest;
+	
+	// When instantiating an ParticleSwarmOptimzer, we supply 
+	// a vector of OptimizationWorkers and the algorithm's parameters.
 	PAO::ParticleSwarmOptimizer PSO( workers, psoparams );
 	
-	PSO.optimize();
-	
+	// Now all that remains is to start the optimization.
+	double y = PSO.optimize();	
 	
 	return 0;
 }

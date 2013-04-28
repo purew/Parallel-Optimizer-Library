@@ -213,7 +213,7 @@ namespace PAO
 		virtual ~MasterOptimizer();
 
 		/** Start optimization. When done, retrieve best solution with getBestParameters() */
-		virtual void optimize() = 0;
+		virtual double optimize() = 0;
 
 		/** Saves parameters when a new fitness high is found.
 		 * 	At optimization's end, use loadBestParams() to send activate them.
