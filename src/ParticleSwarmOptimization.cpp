@@ -71,8 +71,8 @@ void PAO::ParticleSwarmOptimizer::optimize()
 		}
 	}
 
-	chunkSize =  allParticles.size() / threadCount;
-	if (chunkSize > 20* threadCount)
+	chunkSize =  allParticles.size() / workers.size();
+	if (chunkSize > 20*workers.size()) // Todo: cleanup
 		chunkSize /= 10;
 	else if (chunkSize==0)
 		chunkSize+=1;

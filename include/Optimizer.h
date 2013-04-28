@@ -248,7 +248,6 @@ namespace PAO
 		pthread_cond_t beginWorkCond;
 
 		std::vector<OptimizationWorker*> workers;
-		unsigned threadCount;
 		unsigned chunkSize;	//<! Size of chunk grabbed by fetchChunkOfIndata
 		OptimizationWorker* originalWorker;
 		ParameterBounds* paramBounds;

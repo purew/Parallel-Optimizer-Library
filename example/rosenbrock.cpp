@@ -10,7 +10,8 @@ public:
 	double fitnessFunction (PAO::Parameters &parameters);
 
 private:
-	const int Dimensions=5;
+	const int Dimensions=3; // Dimensions of search-space
+	const double L=100; // Length of dimension searched
 };
 
 double Rosenbrock::fitnessFunction(PAO::Parameters &X)
@@ -26,7 +27,7 @@ Rosenbrock::Rosenbrock()
 {
 	PAO::ParameterBounds b;
 	for (int i=0; i<Dimensions; ++i)
-		b.registerParameter(-9999, 9999);
+		b.registerParameter(-L/2, L/2);
 	
 	setParameterBounds(b);
 }
@@ -44,8 +45,10 @@ int main()
 		workers.push_back( (PAO::OptimizationWorker*) w );		
 	}
 	
-	PAO::PSOParameters psoparam;
-	PAO::ParticleSwarmOptimizer PSO( workers, psoparam );
+	PAO::PSOParameters psoparams;
+	psoparams.generations = 200;
+	psoparams.variant = PAO::NeighborhoodBest;
+	PAO::ParticleSwarmOptimizer PSO( workers, psoparams );
 	
 	PSO.optimize();
 	

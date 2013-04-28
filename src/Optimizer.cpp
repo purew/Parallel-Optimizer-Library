@@ -200,9 +200,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	}
 	pthread_mutex_unlock( &indataMutex );
 
-	chunkSize = allTestableSolutions.size() / threadCount;
-	//if (chunkSize > 10* threadCount)
-	//	chunkSize /= 5;
+	chunkSize = allTestableSolutions.size() / workers.size();
 
 	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
 	std::cout.flush();
