@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['masteroptimizer',['MasterOptimizer',['../classMasterOptimizer.html',1,'']]]
+  ['masteroptimizer',['MasterOptimizer',['../classPAO_1_1MasterOptimizer.html',1,'PAO']]]
 ];

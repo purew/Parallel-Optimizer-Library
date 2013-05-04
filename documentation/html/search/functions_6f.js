@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['optimizationworker',['OptimizationWorker',['../classOptimizationWorker.html#ac6ae5b10be6a60a49f98e63e68dbe8a5',1,'OptimizationWorker']]],
-  ['optimize',['optimize',['../classMasterOptimizer.html#ab3252d54046191406ea758bdee22e758',1,'MasterOptimizer::optimize()'],['../classParticleSwarmOptimizer.html#a78ee00a2dd154690e920838144fb9231',1,'ParticleSwarmOptimizer::optimize()']]]
+  ['optimizationworker',['OptimizationWorker',['../classPAO_1_1OptimizationWorker.html#a7b66b033998e4a9d053b73ef1002aca7',1,'PAO::OptimizationWorker']]],
+  ['optimize',['optimize',['../classPAO_1_1MasterOptimizer.html#a7c8827d5587737d031740465fbb75d68',1,'PAO::MasterOptimizer::optimize()'],['../classPAO_1_1ParticleSwarmOptimizer.html#a02a5005f2249d9e4c8eee11e9bb5eaf2',1,'PAO::ParticleSwarmOptimizer::optimize()']]]
 ];

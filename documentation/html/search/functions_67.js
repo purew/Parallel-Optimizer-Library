@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['getbestparameters',['getBestParameters',['../classMasterOptimizer.html#a6779be6c292e791a9f4400fbb02da770',1,'MasterOptimizer']]],
-  ['getnewworker',['getNewWorker',['../classOptimizationWorker.html#a05ada0300de2d4cb66d445b50f5eed14',1,'OptimizationWorker']]],
-  ['getparameterbounds',['getParameterBounds',['../classOptimizationWorker.html#a1bbbb25bc45f3cd96e82a1fcb684cc8d',1,'OptimizationWorker']]],
-  ['getparameters',['getParameters',['../classOptimizationWorker.html#ada90aa36e794a4a121187224a71d6a1f',1,'OptimizationWorker']]]
+  ['getbestparameters',['getBestParameters',['../classPAO_1_1MasterOptimizer.html#a33902a0495dabcb7365de5e0c7286b0b',1,'PAO::MasterOptimizer']]],
+  ['getparameterbounds',['getParameterBounds',['../classPAO_1_1OptimizationWorker.html#a7f5e8bcf50d25d0545a268ef2e458fdc',1,'PAO::OptimizationWorker']]],
+  ['getparameters',['getParameters',['../classPAO_1_1OptimizationWorker.html#a3a1cf45b28bda9f16aace81c40fbbb6a',1,'PAO::OptimizationWorker']]]
 ];

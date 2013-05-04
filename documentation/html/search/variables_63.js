@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['c1',['c1',['../classPSOParameters.html#a1111629b4d80b937b96789304cb1b799',1,'PSOParameters']]],
-  ['c2',['c2',['../classPSOParameters.html#ab5ebc404e27d48fc61a23dcf33c3804c',1,'PSOParameters']]]
+  ['c1',['c1',['../classPAO_1_1PSOParameters.html#a0ccada3235c0696dad75823ad1291098',1,'PAO::PSOParameters']]],
+  ['c2',['c2',['../classPAO_1_1PSOParameters.html#a0ac2358775f0ab14bc6305adea81ad81',1,'PAO::PSOParameters']]]
 ];

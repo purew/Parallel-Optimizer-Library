@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['waitforstartsignal',['waitForStartSignal',['../classMasterOptimizer.html#a0cd92ee71e5db6941807fe7f57f175d4',1,'MasterOptimizer']]],
-  ['waituntilprocessed',['waitUntilProcessed',['../classMasterOptimizer.html#a46ba1ac916159d0d68f2c1df897b9d20',1,'MasterOptimizer']]]
+  ['waitforstartsignal',['waitForStartSignal',['../classPAO_1_1MasterOptimizer.html#a422b5d17c363af7378d7751bb3ddea79',1,'PAO::MasterOptimizer']]],
+  ['waituntilprocessed',['waitUntilProcessed',['../classPAO_1_1MasterOptimizer.html#a234fa6f274074f35a467856db81a8991',1,'PAO::MasterOptimizer']]]
 ];

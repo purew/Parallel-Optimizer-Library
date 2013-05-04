@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['particleswarmoptimizer',['ParticleSwarmOptimizer',['../classParticleSwarmOptimizer.html#ab0809f7182562a5b74d86524e711ab04',1,'ParticleSwarmOptimizer']]]
+  ['particleswarmoptimizer',['ParticleSwarmOptimizer',['../classPAO_1_1ParticleSwarmOptimizer.html#afeff84dae8fe087e04617637548e6e29',1,'PAO::ParticleSwarmOptimizer']]]
 ];

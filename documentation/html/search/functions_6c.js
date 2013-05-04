@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loadbestparams',['loadBestParams',['../classMasterOptimizer.html#a7f4f42406571e1fd4816d454d5849a02',1,'MasterOptimizer']]]
+  ['loadbestparams',['loadBestParams',['../classPAO_1_1MasterOptimizer.html#abd23b2fc253486fffcf376c8f26330ae',1,'PAO::MasterOptimizer']]]
 ];

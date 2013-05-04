@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['savebestparams',['saveBestParams',['../classMasterOptimizer.html#ae87fee2436da1edb15af1c6f718b00a1',1,'MasterOptimizer']]],
-  ['saveoptimizationparameters',['saveOptimizationParameters',['../classOptimizationWorker.html#a0876bf2a3790bd6e0c804d1e9218aa9e',1,'OptimizationWorker']]],
-  ['setmaster',['setMaster',['../classOptimizationWorker.html#aa10f41e10d69b4919ca822627772e407',1,'OptimizationWorker']]],
-  ['setparameterbounds',['setParameterBounds',['../classOptimizationWorker.html#ae7923efc2db3cf045d08fd4d40a917d5',1,'OptimizationWorker']]],
-  ['setparameters',['setParameters',['../classOptimizationWorker.html#a986301909acdea14917f62cbb84b9499',1,'OptimizationWorker']]],
-  ['size',['size',['../classParameterBounds.html#a08e59a70491d670b07e2886fe0eebbd9',1,'ParameterBounds']]],
-  ['startworker',['startWorker',['../classOptimizationWorker.html#aacdbed503d5b5db69f6bdd51a1c2dcaf',1,'OptimizationWorker']]]
+  ['savebestparams',['saveBestParams',['../classPAO_1_1MasterOptimizer.html#a2fc8e4ad5f6a7a15b73200b2d8d10fdd',1,'PAO::MasterOptimizer']]],
+  ['saveoptimizationparameters',['saveOptimizationParameters',['../classPAO_1_1OptimizationWorker.html#a43d01eb865604f07ef7ce861400c7af6',1,'PAO::OptimizationWorker']]],
+  ['setmaster',['setMaster',['../classPAO_1_1OptimizationWorker.html#ad3f6be2b8790690d61bcacc5d7d4faef',1,'PAO::OptimizationWorker']]],
+  ['setparameterbounds',['setParameterBounds',['../classPAO_1_1OptimizationWorker.html#a77baab20e8c81cb06a5fac7e139728bb',1,'PAO::OptimizationWorker']]],
+  ['setparameters',['setParameters',['../classPAO_1_1OptimizationWorker.html#adf15e282cf746e97c5678837fb73c835',1,'PAO::OptimizationWorker']]],
+  ['shouldstop',['shouldStop',['../classPAO_1_1OptimizationWorker.html#a2c811720b5adf86c3d53679c93f172f9',1,'PAO::OptimizationWorker']]],
+  ['size',['size',['../classPAO_1_1ParameterBounds.html#ab10033f0325ff38685f1056931eca328',1,'PAO::ParameterBounds']]],
+  ['startworker',['startWorker',['../classPAO_1_1OptimizationWorker.html#a41792d8dac0b053fbbf197bc02507297',1,'PAO::OptimizationWorker']]]
 ];
