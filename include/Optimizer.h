@@ -28,6 +28,23 @@ Choose an appropriate MasterOptimizer, for example the ParticleSwarmOptimizer,
 and call its MasterOptimizer.optimize() to start the search for a solution.
 
 When done, retrieve best solution with MasterOptimizer.getBestParameters().
+
+Example
+=======
+
+There is an example implementation of the Rosenbrock-problem in 
+example/rosenbrock.cpp which is built with CMake using
+
+	mkdir Debug
+	cd Debug
+	cmake ..
+	make
+
+Or by using the helper-script 
+
+	./runcmake debug 	or
+	./runcmake release
+	
  
 LICENSE
 =======
@@ -64,8 +81,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <string>
 #include <pthread.h>
+#include <atomic>
 #include <random>
-
+#include <iostream>
 
 namespace PAO
 {
@@ -106,6 +124,8 @@ namespace PAO
 	private:
 	};
 
+	/** The parameters for fitness-function, or the X in f(X). 
+	 * 	At the moment implemented as an std::vector<double>. */
 	class Parameters : public std::vector<double>
 	{
 
@@ -141,8 +161,8 @@ namespace PAO
 		 * 	used for preprocessing and initializing data.
 		 * 	Each worker lives in it's own thread.
 		 */
-		OptimizationWorker() {};
-		virtual ~OptimizationWorker() {};
+		OptimizationWorker();
+		virtual ~OptimizationWorker();
 
 		/** Sets a MasterOptimizer for this worker.
 		 * Called by MasterOptimizer*/
@@ -154,6 +174,11 @@ namespace PAO
 
 		/** Creates a new thread and tries to acquire access to input data from masterOptimizer */
 		void startWorker();
+		/** Sends a cancellation request to thread running OptimizationWorker.
+		 *  Destructor is called during this call. */
+		void cancelWorker();
+		/** Returns true if worker is scheduled to stop and exit thread. */
+		bool shouldStop() {return stop;};
 
 		/** Thread does work in this function until all work is done.
 		 * Responsible for locking/getting input data, starting simulation, and locking/saving output. */
@@ -182,7 +207,7 @@ namespace PAO
 
 		MasterOptimizer* master;
 		pthread_t thread;
-
+		std::atomic<bool> stop;
 	};
 
 	/* Function used when starting worker in new thread.
@@ -224,13 +249,13 @@ namespace PAO
 		void loadBestParams();
 
 		/** Unlock indata queue so that worker threads may start computations */
-		void unlockIndata( );
+		void unlockIndata();
 
 		/** Block until optimizing algorithm sends start signal */
-		void waitForStartSignal();
+		void waitForStartSignal( PAO::OptimizationWorker *caller );
 
 		/** Block until all data scheduled for computation have been computed.
-		 * 	\param itemsToProcess The total number of packets on indata queue. */
+		 * 	\param itemsToProcess The total number of packets on indata queue.*/
 		void waitUntilProcessed( unsigned itemsToProcess );
 
 		/** Fetch OptimizationData from the input queue.

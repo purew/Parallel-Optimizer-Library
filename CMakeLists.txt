@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
-project(example_rosenbrock)
-set (PROJECT_NAME example_rosenbrock)
+project(examples)
+set (PROJECT_NAME examples)
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 # The version number.
@@ -17,7 +17,11 @@ include_directories(
 	"include"	
 	)
 
-FILE(GLOB_RECURSE SOURCES example/*.cpp)
+set(ROSENBROCK_BINARY "rosenbrock")
+set(ROSENBROCK_SOURCES "example/rosenbrock.cpp")
+
+set(EVALUATION_BINARY "evaluation")
+set(EVALUATION_SOURCES "example/evaluation.cpp")
 
 ADD_LIBRARY( 
 	pao
@@ -26,6 +30,9 @@ ADD_LIBRARY(
 )
 
  
-# add the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries( ${PROJECT_NAME} pao pthread rt)
+# add the executables
+add_executable(${ROSENBROCK_BINARY} ${ROSENBROCK_SOURCES})
+target_link_libraries( ${ROSENBROCK_BINARY} pao pthread rt)
+
+add_executable(${EVALUATION_BINARY} ${EVALUATION_SOURCES})
+target_link_libraries( ${EVALUATION_BINARY} pao pthread rt)

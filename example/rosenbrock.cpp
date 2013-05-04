@@ -51,27 +51,31 @@ int main()
 {
 	int numWorkers = 4;	
 	
-	std::vector<Rosenbrock*> realWorkers;
+	// The optimizer takes a vector of OptimizationWorker*'s as argument
+	// where each worker runs in parallell during optimization.
+	// Here we create that vector:
 	std::vector<PAO::OptimizationWorker*> workers;
 	for (int i=0; i<numWorkers; ++i)
 	{
 		Rosenbrock *w = new Rosenbrock;
-		realWorkers.push_back( w );
 		workers.push_back( (PAO::OptimizationWorker*) w );		
 	}
 	
-	// Here we specify som parameters for the particle swarm
+	// Here we specify some parameters for the particle swarm
 	// optimization algorithm.
 	PAO::PSOParameters psoparams;
-	psoparams.generations = 200;
+	psoparams.generations = 100;
 	psoparams.variant = PAO::NeighborhoodBest;
 	
-	// When instantiating an ParticleSwarmOptimzer, we supply 
+	// When instantiating a ParticleSwarmOptimzer, we supply 
 	// a vector of OptimizationWorkers and the algorithm's parameters.
 	PAO::ParticleSwarmOptimizer PSO( workers, psoparams );
 	
 	// Now all that remains is to start the optimization.
 	double y = PSO.optimize();	
+	
+	//for (int i=0; i<numWorkers; ++i)
+	//	delete workers[i];
 	
 	return 0;
 }

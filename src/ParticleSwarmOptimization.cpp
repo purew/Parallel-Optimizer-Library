@@ -29,10 +29,10 @@ double PAO::ParticleSwarmOptimizer::optimize()
 	switch (pso.variant)
 	{
 	case PopulationBest:
-		std::cout << "Using population best variant\n\n";
+		std::cout << "Using population best variant\n";
 		break;
 	case NeighborhoodBest:
-		std::cout << "Using neighborhood best variant\n\n";
+		std::cout << "Using neighborhood best variant\n";
 		break;
 	}
 	std::cout << "Using PSO:c1="<<pso.c1<<", PSO:c2="<<pso.c2<<std::endl;
@@ -78,13 +78,14 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		chunkSize+=1;
 
 	bestParameters.fitnessValue = std::numeric_limits<double>::max();
+	bestParameters.parameters = allParticles.back().x.parameters;
 	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
 
 	timespec clockStarted;
 	clock_gettime(CLOCK_REALTIME,&clockStarted);
 
 	// Start main swarm loop
-	for (unsigned i=0; i<pso.generations;++i)
+	for (unsigned generation=0; generation<pso.generations;++generation)
 	{
 		/*if ((pso.generations<ProgressUpdates || i%(int)(pso.generations/(float)ProgressUpdates)==0) && i>0)
 		{
@@ -97,29 +98,6 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			std::cout << "Time left: "<< (int)timeLeft/60 <<" min and "<<(int)timeLeft%60<<" seconds\n";
 			std::cout.flush();
 		}*/
-
-		unlockIndata();
-
-		waitUntilProcessed( allParticles.size() );
-
-		outdataList.clear();
-
-		// Check solutions
-		for (unsigned i=0; i < allParticles.size(); ++i)
-		{
-			// Update particle's best location
-			if (allParticles[i].x.fitnessValue < allParticles[i].p.fitnessValue )
-			{
-				allParticles[i].p = allParticles[i].x;
-			}
-
-			// Update population best location
-			if ( allParticles[i].x.fitnessValue < bestParameters.fitnessValue )
-			{
-				bestParameters = allParticles[i].x;
-				std::cout << "Best fitness value "<<bestParameters.fitnessValue<< std::endl;
-			}
-		}
 
 		if (pso.variant == NeighborhoodBest)
 		{
@@ -184,6 +162,33 @@ double PAO::ParticleSwarmOptimizer::optimize()
 
 		// Lower inertia for next generation
 		inertia -= 0.7/pso.generations;
+
+
+		unlockIndata();
+
+		waitUntilProcessed( allParticles.size() );
+
+		outdataList.clear();
+
+		// Check solutions
+		for (unsigned part=0; part < allParticles.size(); ++part)
+		{
+			// Update particle's best location
+			if (allParticles[part].x.fitnessValue < allParticles[part].p.fitnessValue )
+			{
+				allParticles[part].p = allParticles[part].x;
+			}
+
+			// Update population best location
+			if ( allParticles[part].x.fitnessValue < bestParameters.fitnessValue )
+			{
+				bestParameters = allParticles[part].x;
+			//	std::cout << "Generation "<<generation<<": Best fitness value "<<bestParameters.fitnessValue<< std::endl;
+			}
+		}
+
+		//std::cout << generation<<std::endl;
+
 	}
 	return bestParameters.fitnessValue;
 }
