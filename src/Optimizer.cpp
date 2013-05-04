@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <pthread.h>
 #include <errno.h>
 #include <cstring>
 #include <cstdlib>
@@ -66,38 +65,38 @@ void PAO::ParameterBounds::registerParameter( double _min, double _max )
 /** Creates a new thread and tries to acquire access to input data from masterOptimizer */
 void PAO::OptimizationWorker::startWorker()
 {
-	int err =pthread_create( &thread, 0, startOptimizationWorkerThread, (void*)this);
-	if (err)
-		ERROR("Could not spawn thread");
+	if (thrd==0)
+	{
+		thrd = new std::thread(startOptimizationWorkerThread, (void*)this);
+	}
+	else
+		ERROR("thrd!=0");
 }
 void PAO::OptimizationWorker::cancelWorker()
 {
-	if (thread != 0)
+	if (thrd != 0)
 	{
 		stop = true;
-		master->unlockIndata();
+		master->notifyWorkers();
 
-		int err = pthread_join( thread, 0 );
-		if (err)
-		{
-			std::cout << EDEADLK <<std::endl <<EINVAL <<std::endl <<ESRCH <<std::endl;
-			ERROR("Could not join thread "<<thread<<". Error: "<<err<<" "<<"\""<<strerror(err)<<"\"");
-		}
+		if (thrd->joinable())
+			thrd->join();
+		else
+			std::cout << "thrd "<<thrd->get_id()<<std::endl;
 	}
 	else
-		ERROR("Thread not initialized yet");
+		WARN("thrd=0");
 }
 
 PAO::OptimizationWorker::OptimizationWorker()
 {
 	master=0;
-	thread=0;
 	stop = false;
+	thrd = 0;
 }
 
 PAO::OptimizationWorker::~OptimizationWorker()
 {
-	cancelWorker();
 }
 
 /** Thread does work in this function until all work is done.
@@ -106,35 +105,36 @@ void PAO::OptimizationWorker::doWork()
 {
 	for (;;)
 	{
-		master->waitForStartSignal( this );
-
-		if (shouldStop())
-			break;
+		master->waitForStartSignal();
 
 		for (;;)
 		{
 
-			std::vector<OptimizationData*> dataList = master->fetchChunkOfIndata();
+			std::list<OptimizationData*> dataList = master->fetchChunkOfIndata();
 
 			if (dataList.empty())
-				break;
-
-			for (unsigned i=0; i < dataList.size(); ++i)
 			{
-				parameters = dataList[i]->parameters;
+				stop=true;
+				break;
+			}
 
+			std::list<OptimizationData*>::iterator it;
+			for (it=dataList.begin(); it!=dataList.end(); ++it)
+			{
 				// Run simulation
-				double result = fitnessFunction(parameters);
+				double result = fitnessFunction((*it)->parameters);
 
 				// Save fitness value
-				dataList[i]->fitnessValue = result;
+				(*it)->fitnessValue = result;
 
 				//std::cout << "Param "<< data->params[0] << " gave fitness "<<data->fitnessValue<<std::endl;
 
 			}
-
 			master->pushToOutdata( dataList );
 		}
+
+		if (shouldStop())
+			break;
 	}
 }
 
@@ -143,7 +143,6 @@ void* PAO::startOptimizationWorkerThread( void* pOptimizationWorker )
 {
 	OptimizationWorker* worker = (OptimizationWorker*) pOptimizationWorker;
 	worker->doWork();
-	pthread_exit(0);
 	return 0;
 }
 
@@ -207,9 +206,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	std::vector<OptimizationData> allTestableSolutions;
 	allTestableSolutions.reserve(N);
 
-	int ret = pthread_mutex_lock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with mutex");
+	xmutex.lock();
 
 	for (int n=0; n<params; ++n)
 	{
@@ -232,9 +229,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 			//std::cout << allTestableSolutions[i+n*steps].params[0] << std::endl;
 		}
 	}
-	ret = pthread_mutex_unlock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with mutex");
+	xmutex.unlock();
 
 	chunkSize = allTestableSolutions.size() / workers.size();
 
@@ -242,7 +237,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	std::cout.flush();
 
 
-	unlockIndata();
+	notifyWorkers();
 
 	waitUntilProcessed( allTestableSolutions.size() );
 
@@ -319,23 +314,20 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 	std::cout.flush();
 
 	// Now, wait for all to be done
-	unlockIndata();
+	notifyWorkers();
 
-	int unprocessedItems;
+	/*int unprocessedItems;
 	do
 	{
 		usleep(1e6); // Todo: fix 
-		int ret = pthread_mutex_lock( &indataMutex );
-		if (ret!=0)
-			ERROR("Problem with mutex");
+		indataMutex.lock();
 
 		unprocessedItems = indataList.size();
 		std::cout << "indataList contains " << unprocessedItems << " untested solutions\n";
 
-		ret = pthread_mutex_unlock( &indataMutex );
-		if (ret!=0)
-			ERROR("Problem with mutex");
-	} while (unprocessedItems>0);
+		indataMutex.unlock();
+
+	} while (unprocessedItems>0);*/
 
 	// All parameters tested, load the best parameters found
 
@@ -352,16 +344,14 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 
 /** Fetch OptimizationData from the input queue.
  * 	The number of items fetched depends on number of threads. */
-std::vector<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
+std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 {
-	int ret=0;
+	std::list<OptimizationData*> fetched;
 
-	ret = pthread_mutex_lock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with semaphore");
+	std::unique_lock<std::mutex> lock(xmutex);
+	waitForStartSignal(lock);
 
-	std::vector<OptimizationData*> fetched;
-	fetched.reserve(chunkSize);
+	//fetched.reserve(chunkSize);
 	unsigned indataSize = indataList.size();
 
 	for ( unsigned i=0; i < indataSize && i < chunkSize; ++i )
@@ -370,20 +360,21 @@ std::vector<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 		indataList.pop_front();
 		fetched.push_back(indata);
 	}
-	ret = pthread_mutex_unlock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with mutex");
+
+	//else
+	//	ERROR("wait_for() timed out");
 	return fetched;
 }
 
-void PAO::MasterOptimizer::pushToOutdata( std::vector<OptimizationData*> &data )
+void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
 {
-	pthread_mutex_lock( &outdataMutex);
-	for (unsigned i=0; i < data.size(); i++)
+	outdataMutex.lock();
+	std::list<OptimizationData*>::iterator it;
+	for (it = data.begin(); it!=data.end(); it++)
 	{
-		outdataList.push_back( data[i] );
+		outdataList.push_back( *it );
 	}
-	pthread_mutex_unlock( &outdataMutex );
+	outdataMutex.unlock();
 }
 
 /** Block until all data scheduled for computation have been computed. */
@@ -393,11 +384,11 @@ void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess )
 	do
 	{
 		usleep(1e4); // Todo: get rid of sleep
-		pthread_mutex_lock( &outdataMutex );
+		outdataMutex.lock();
 		processedItems = outdataList.size();
 	//	std::cout << ".";
 	//	std::cout.flush();
-		pthread_mutex_unlock( &outdataMutex );
+		outdataMutex.unlock();
 	} while (processedItems < itemsToProcess);
 }
 
@@ -407,25 +398,12 @@ PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers 
 	generator.seed(seed);
 
 	this->workers = workers;
+	workersDone = false;
 	
 	chunkSize = 1;
 	paramBounds = &(workers.front()->getParameterBounds());
 	if (paramBounds->size()<=0)
 		ERROR("Please set appropriate parameter-bounds.\nParameterBounds->size<=0");
-
-	int ret;
-	ret = pthread_mutex_init( &indataMutex, 0);
-	if (ret!=0)
-		ERROR("Problem with mutex:  "<<strerror(ret));
-
-	ret = pthread_mutex_init( &outdataMutex, 0);
-	if (ret!=0)
-		ERROR("Problem with mutex: "<<strerror(ret));
-
-
-	ret = pthread_cond_init( &beginWorkCond, 0 );
-	if (ret!=0)
-			ERROR("Problem with condition variable: "<<strerror(ret));
 
 	// Find number of cores
 	/*if (maxThreads>0)
@@ -448,43 +426,25 @@ PAO::MasterOptimizer::~MasterOptimizer()
 {
 	for (unsigned i=0; i<workers.size(); ++i)
 	{
-		delete workers[i];
+		workers[i]->cancelWorker();
 	}
-	workers.clear();
-
-	pthread_mutex_destroy(&indataMutex);
-	pthread_mutex_destroy(&outdataMutex);
-	pthread_cond_destroy( &beginWorkCond );
 }
 
 /** Unlock indata queue so that worker threads may start computations */
-void PAO::MasterOptimizer::unlockIndata( )
+void PAO::MasterOptimizer::notifyWorkers( )
 {
-	pthread_cond_broadcast( &beginWorkCond );
+	notEmpty.notify_all();
 };
 
 /** Block until optimizing algorithm sends start signal */
-void PAO::MasterOptimizer::waitForStartSignal( PAO::OptimizationWorker *caller )
+void PAO::MasterOptimizer::waitForStartSignal(std::unique_lock<std::mutex> &lock)
 {
-	int ret = pthread_mutex_lock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with mutex");
-	
-	bool canStart = false;
-	while (!canStart)
-	{
-		ret = pthread_cond_wait( &beginWorkCond, &indataMutex );
-
-		if (ret!=0)
-			ERROR("pthread_cond_wait returned: "<<ret<<" \""<<strerror(ret)<<"\"");
-
-		if ( indataList.size()>0
-			|| caller->shouldStop() )
-			break;
-	}
-
-	ret = pthread_mutex_unlock( &indataMutex );
-	if (ret!=0)
-		ERROR("Problem with mutex");
+	notEmpty.wait(lock, [&] {
+		return (indataList.size()>0 || workersDone) ; });
 }
 
+void PAO::MasterOptimizer::waitForStartSignal()
+{
+	std::unique_lock<std::mutex> lock(xmutex);
+	waitForStartSignal(lock);
+}

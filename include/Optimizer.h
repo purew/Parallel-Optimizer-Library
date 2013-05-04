@@ -80,7 +80,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <list>
 #include <vector>
 #include <string>
-#include <pthread.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <atomic>
 #include <random>
 #include <iostream>
@@ -206,7 +208,7 @@ namespace PAO
 		ParameterBounds parameterBounds;
 
 		MasterOptimizer* master;
-		pthread_t thread;
+		std::thread *thrd;
 		std::atomic<bool> stop;
 	};
 
@@ -248,11 +250,13 @@ namespace PAO
 		/** Used to load the best params found so far */
 		void loadBestParams();
 
-		/** Unlock indata queue so that worker threads may start computations */
-		void unlockIndata();
+		/** Notify workers */
+		void notifyWorkers();
 
 		/** Block until optimizing algorithm sends start signal */
-		void waitForStartSignal( PAO::OptimizationWorker *caller );
+		void waitForStartSignal(std::unique_lock<std::mutex> &lock);
+		void waitForStartSignal();
+
 
 		/** Block until all data scheduled for computation have been computed.
 		 * 	\param itemsToProcess The total number of packets on indata queue.*/
@@ -260,17 +264,17 @@ namespace PAO
 
 		/** Fetch OptimizationData from the input queue.
 		 * 	The number of items fetched depends on chunkSize */
-		std::vector<PAO::OptimizationData*> fetchChunkOfIndata();
-		void pushToOutdata( std::vector<OptimizationData*> &data );
+		std::list<PAO::OptimizationData*> fetchChunkOfIndata();
+		void pushToOutdata( std::list<OptimizationData*> &data );
 
 		/** Returns the best solution found so far. See optimize().*/
 		OptimizationData* getBestParameters() {return &bestParameters;};
 
 	protected:
 
-		pthread_mutex_t indataMutex;
-		pthread_mutex_t outdataMutex;
-		pthread_cond_t beginWorkCond;
+		std::mutex xmutex;
+		std::mutex outdataMutex;
+		std::atomic<bool> workersDone;
 
 		std::vector<OptimizationWorker*> workers;
 		unsigned chunkSize;	//<! Size of chunk grabbed by fetchChunkOfIndata
@@ -284,10 +288,12 @@ namespace PAO
 		std::list<OptimizationData*> outdataList;
 
 	private:
+		std::condition_variable notEmpty;
+
+
 		/** Simple brute force algorithm */
 		void optimizeBruteforce();
 		void optimizeRandomSearch();
-
 
 	};
 

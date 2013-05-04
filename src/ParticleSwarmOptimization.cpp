@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <pthread.h>
+#include <thread>
 #include <errno.h>
 #include <cstring>
 #include <cstdlib>
@@ -154,17 +154,19 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			}
 		}
 
-		// Add particles to queue
-		pthread_mutex_lock( &indataMutex );
-		for (unsigned i=0; i<pso.particleCount; ++i)
-			indataList.push_back( &(allParticles[i].x) );
-		pthread_mutex_unlock( &indataMutex );
-
 		// Lower inertia for next generation
 		inertia -= 0.7/pso.generations;
 
+		//std::cout <<"Locking xmutex"<<std::endl;
+		// Add particles to queue
+		xmutex.lock();
+		for (unsigned i=0; i<pso.particleCount; ++i)
+			indataList.push_back( &(allParticles[i].x) );
+		xmutex.unlock();
 
-		unlockIndata();
+		//std::cout << "Items added"<<std::endl;
+
+		notifyWorkers();
 
 		waitUntilProcessed( allParticles.size() );
 
@@ -186,10 +188,8 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			//	std::cout << "Generation "<<generation<<": Best fitness value "<<bestParameters.fitnessValue<< std::endl;
 			}
 		}
-
-		//std::cout << generation<<std::endl;
-
 	}
+	workersDone = true;
 	return bestParameters.fitnessValue;
 }
 

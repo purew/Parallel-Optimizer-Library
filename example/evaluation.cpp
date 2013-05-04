@@ -8,38 +8,6 @@
 
 #include "Statistics.h"
 
-void DumpBacktrace(int) {
-	pid_t dying_pid = getpid();
-	pid_t child_pid = fork();
-	if (child_pid < 0) 
-	{
-		perror("fork() while collecting backtrace:");
-	} else if (child_pid == 0) 
-	{
-		char buf[1024];
-		sprintf(buf, "gdb -p %d -batch -ex bt 2>/dev/null | "
-				"sed '0,/<signal handler/d'", dying_pid);
-		const char* argv[] = {"sh", "-c", buf, NULL};
-		execve("/bin/sh", (char**)argv, NULL);
-		_exit(1);
-	} 
-	else 
-	{
-		waitpid(child_pid, NULL, 0);
-	}
-	_exit(1);
-}
-
-void BacktraceOnSegv() 
-{
-	struct sigaction action = {};
-	action.sa_handler = DumpBacktrace;
-	if (sigaction(SIGSEGV, &action, NULL) < 0) 
-	{
-		perror("sigaction(SEGV)");
-	}
-}
-
 
 class Rosenbrock : public PAO::OptimizationWorker
 {
@@ -55,7 +23,7 @@ private:
 	// Other than implementing fitnessFunction and supplying
 	// parameter-bounds as seen below, there are no other requirements.
 	
-	const int Dimensions=3; // Dimensions of search-space
+	const int Dimensions=2; // Dimensions of search-space
 	const double L=10; // Length of dimension searched
 };
 
@@ -81,9 +49,7 @@ Rosenbrock::Rosenbrock()
 
 int main()
 {
-	BacktraceOnSegv();
-	
-	const int NumRuns=100;
+	const int NumRuns=10;
 		
 	std::vector<double> results(NumRuns);
 	for (int i=0; i<NumRuns; ++i)
@@ -105,7 +71,7 @@ int main()
 		// Here we specify some parameters for the particle swarm
 		// optimization algorithm.
 		PAO::PSOParameters psoparams;
-		psoparams.particleCount = 100;
+		psoparams.particleCount = 10;
 		psoparams.generations = 100;
 		psoparams.variant = PAO::NeighborhoodBest;
 		
@@ -114,8 +80,14 @@ int main()
 		PAO::ParticleSwarmOptimizer *PSO = new PAO::ParticleSwarmOptimizer( workers, psoparams );
 		
 		// Now all that remains is to start the optimization.
-		results[i] = PSO->optimize();
+		double y = results[i] = PSO->optimize();
+
+		std::cout << "Result is "<<y<<std::endl;
+
+		// Cleanup
 		delete PSO;
+		for (int i=0; i<numWorkers; ++i)
+			delete workers[i];
 	}	
 	
 	std::cout << "Mean is   "<<mean(results)<<std::endl;

@@ -74,8 +74,10 @@ int main()
 	// Now all that remains is to start the optimization.
 	double y = PSO.optimize();	
 	
-	//for (int i=0; i<numWorkers; ++i)
-	//	delete workers[i];
+	std::cout << "Best value found is "<<y<<std::endl;
+
+	for (int i=0; i<numWorkers; ++i)
+		delete workers[i];
 	
 	return 0;
 }
