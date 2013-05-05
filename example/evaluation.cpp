@@ -1,12 +1,20 @@
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <atomic>
 
 #include "Optimizer.h"
 #include "ParticleSwarmOptimization.h"
 
 #include "Statistics.h"
+
+
+/**
+ *  For an example on how to use Parallel Optimizer Library,
+ *  have a look in example/rosenbrock.cpp.
+ *
+ * 	This file is used for development and evaluation of Parallel Optimizer Library.
+ * 	It may or may not be useful to other people.
+ */
+
 
 
 class Rosenbrock : public PAO::OptimizationWorker
@@ -19,16 +27,23 @@ public:
 	// and return the value of said function.
 	double fitnessFunction (PAO::Parameters &parameters);
 
+	static int nbrEvaluations() {return evaluations;};
+
 private:
 	// Other than implementing fitnessFunction and supplying
 	// parameter-bounds as seen below, there are no other requirements.
 	
-	const int Dimensions=2; // Dimensions of search-space
+	const int Dimensions=5; // Dimensions of search-space
 	const double L=10; // Length of dimension searched
+
+	static std::atomic<int> evaluations;
 };
+
+std::atomic<int> Rosenbrock::evaluations(0);
 
 double Rosenbrock::fitnessFunction(PAO::Parameters &X)
 {
+	evaluations += 1;
 	double sum=0;
 	for (int i=0; i<Dimensions-1; ++i)
 		sum += 100*pow( X[i+1] - X[i]*X[i], 2) + pow(X[i]-1, 2);
@@ -71,7 +86,7 @@ int main()
 		// Here we specify some parameters for the particle swarm
 		// optimization algorithm.
 		PAO::PSOParameters psoparams;
-		psoparams.particleCount = 10;
+		psoparams.particleCount = 1000;
 		psoparams.generations = 100;
 		psoparams.variant = PAO::NeighborhoodBest;
 		
@@ -90,6 +105,14 @@ int main()
 			delete workers[i];
 	}	
 	
+	double minY = std::numeric_limits<double>::max();
+	for (unsigned i=0; i<results.size(); ++i)
+		if (results[i] < minY)
+			minY = results[i];
+
+	std::cout << "\n*************************\n";
+	std::cout << "Performed "<<NumRuns<<" optimizations and "<<Rosenbrock::nbrEvaluations()/(float)NumRuns<<" function evaluations in each"<<std::endl;
+	std::cout << "Best is   "<<minY<<std::endl;
 	std::cout << "Mean is   "<<mean(results)<<std::endl;
 	std::cout << "Stddev is "<<stddev(results)<<std::endl;
 	

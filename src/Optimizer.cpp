@@ -206,7 +206,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	std::vector<OptimizationData> allTestableSolutions;
 	allTestableSolutions.reserve(N);
 
-	xmutex.lock();
+	inmutex.lock();
 
 	for (int n=0; n<params; ++n)
 	{
@@ -229,7 +229,7 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 			//std::cout << allTestableSolutions[i+n*steps].params[0] << std::endl;
 		}
 	}
-	xmutex.unlock();
+	inmutex.unlock();
 
 	chunkSize = allTestableSolutions.size() / workers.size();
 
@@ -316,21 +316,7 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 	// Now, wait for all to be done
 	notifyWorkers();
 
-	/*int unprocessedItems;
-	do
-	{
-		usleep(1e6); // Todo: fix 
-		indataMutex.lock();
-
-		unprocessedItems = indataList.size();
-		std::cout << "indataList contains " << unprocessedItems << " untested solutions\n";
-
-		indataMutex.unlock();
-
-	} while (unprocessedItems>0);*/
-
 	// All parameters tested, load the best parameters found
-
 	std::vector<OptimizationData>::iterator it;
 	for (it = allTestableSolutions.begin(); it != allTestableSolutions.end(); ++it)
 	{
@@ -348,7 +334,7 @@ std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 {
 	std::list<OptimizationData*> fetched;
 
-	std::unique_lock<std::mutex> lock(xmutex);
+	std::unique_lock<std::mutex> lock(inmutex);
 	waitForStartSignal(lock);
 
 	//fetched.reserve(chunkSize);
@@ -368,28 +354,21 @@ std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 
 void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
 {
-	outdataMutex.lock();
-	std::list<OptimizationData*>::iterator it;
-	for (it = data.begin(); it!=data.end(); it++)
-	{
-		outdataList.push_back( *it );
-	}
-	outdataMutex.unlock();
+	outmutex.lock();
+	std::list<OptimizationData*>::iterator it = outdataList.end();
+	outdataList.insert(it, data.begin(), data.end());
+	outmutex.unlock();
+
+	// Notify MasterOptimizer that some solutions are ready
+	outdataReady.notify_all();
 }
 
 /** Block until all data scheduled for computation have been computed. */
 void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess )
 {
-	unsigned processedItems;
-	do
-	{
-		usleep(1e4); // Todo: get rid of sleep
-		outdataMutex.lock();
-		processedItems = outdataList.size();
-	//	std::cout << ".";
-	//	std::cout.flush();
-		outdataMutex.unlock();
-	} while (processedItems < itemsToProcess);
+	std::unique_lock<std::mutex> lock(outmutex);
+	outdataReady.wait(lock, [&] {
+		return (itemsToProcess == outdataList.size()) ; });
 }
 
 PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers )
@@ -433,18 +412,18 @@ PAO::MasterOptimizer::~MasterOptimizer()
 /** Unlock indata queue so that worker threads may start computations */
 void PAO::MasterOptimizer::notifyWorkers( )
 {
-	notEmpty.notify_all();
+	indataReady.notify_all();
 };
 
 /** Block until optimizing algorithm sends start signal */
 void PAO::MasterOptimizer::waitForStartSignal(std::unique_lock<std::mutex> &lock)
 {
-	notEmpty.wait(lock, [&] {
+	indataReady.wait(lock, [&] {
 		return (indataList.size()>0 || workersDone) ; });
 }
 
 void PAO::MasterOptimizer::waitForStartSignal()
 {
-	std::unique_lock<std::mutex> lock(xmutex);
+	std::unique_lock<std::mutex> lock(inmutex);
 	waitForStartSignal(lock);
 }

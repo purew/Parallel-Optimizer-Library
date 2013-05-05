@@ -57,7 +57,7 @@ namespace PAO
 		double c2;					///< Influence of population or neighborhood best particle position
 	};
 
-
+	/** Class used by ParticleSwarmOptimizer */
 	class SwarmParticle
 	{
 	public:

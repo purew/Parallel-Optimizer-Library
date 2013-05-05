@@ -62,7 +62,6 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		particle.p = particle.x;
 
 		allParticles.push_back(particle);
-		indataList.push_front( &(allParticles.back().x) );
 
 		if (pso.variant == NeighborhoodBest)
 		{
@@ -157,14 +156,11 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		// Lower inertia for next generation
 		inertia -= 0.7/pso.generations;
 
-		//std::cout <<"Locking xmutex"<<std::endl;
 		// Add particles to queue
-		xmutex.lock();
+		inmutex.lock();
 		for (unsigned i=0; i<pso.particleCount; ++i)
 			indataList.push_back( &(allParticles[i].x) );
-		xmutex.unlock();
-
-		//std::cout << "Items added"<<std::endl;
+		inmutex.unlock();
 
 		notifyWorkers();
 
@@ -192,8 +188,6 @@ double PAO::ParticleSwarmOptimizer::optimize()
 	workersDone = true;
 	return bestParameters.fitnessValue;
 }
-
-
 
 PAO::ParticleSwarmOptimizer::ParticleSwarmOptimizer( 
 	std::vector<PAO::OptimizationWorker*> workers, 

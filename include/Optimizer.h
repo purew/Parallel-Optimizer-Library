@@ -45,6 +45,16 @@ Or by using the helper-script
 	./runcmake debug 	or
 	./runcmake release
 	
+
+Todo
+====
+
+- MPI-support
+- Auto-tuning of PSO-swarm.
+- Exhaustive search for reference.
+- Add regression tests
+- Implement a way for user to disable and/or customize what library prints to stdout.
+
  
 LICENSE
 =======
@@ -71,6 +81,8 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
 ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+END OF DOCUMENTATION
  */
 
 
@@ -239,15 +251,17 @@ namespace PAO
 		MasterOptimizer( std::vector<OptimizationWorker*> workers );
 		virtual ~MasterOptimizer();
 
-		/** Start optimization. When done, retrieve best solution with getBestParameters() */
+		/** Start optimization of OptimizationWorker.fitnessFunction.
+		 *  When done, retrieve best solution with getBestParameters().
+		 *  \return Best value of fitnessFunction found. */
 		virtual double optimize() = 0;
 
-		/** Saves parameters when a new fitness high is found.
-		 * 	At optimization's end, use loadBestParams() to send activate them.
-		 */
+		/** Save best parameters found after calling optimize() to file.
+		 *  Todo: Let user pick filename */
 		void saveBestParams();
 
-		/** Used to load the best params found so far */
+		/** Load parameters saved with saveBestParams()
+		*   Todo: Let user pick filename*/
 		void loadBestParams();
 
 		/** Notify workers */
@@ -272,8 +286,8 @@ namespace PAO
 
 	protected:
 
-		std::mutex xmutex;
-		std::mutex outdataMutex;
+		std::mutex inmutex;
+		std::mutex outmutex;
 		std::atomic<bool> workersDone;
 
 		std::vector<OptimizationWorker*> workers;
@@ -288,7 +302,8 @@ namespace PAO
 		std::list<OptimizationData*> outdataList;
 
 	private:
-		std::condition_variable notEmpty;
+		std::condition_variable indataReady;
+		std::condition_variable outdataReady;
 
 
 		/** Simple brute force algorithm */
@@ -296,8 +311,5 @@ namespace PAO
 		void optimizeRandomSearch();
 
 	};
-
-
-
 }
 #endif /* OPTIMIZER_H_ */
