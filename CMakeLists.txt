@@ -33,7 +33,7 @@ ADD_LIBRARY(
 # Add step to update README.md with contents from Optimizer.h
 ADD_CUSTOM_COMMAND(OUTPUT "README.md"
 	COMMAND sed -e '/END OF DOCUMENTATION/,$$d' include/Optimizer.h | tail -n +2 > README.md
-	MAIN_DEPENDENCY "include/Optimizer.h"
+	MAIN_DEPENDENCY "../include/Optimizer.h"
 	WORKING_DIRECTORY ..)
  
 # add the executables

@@ -378,6 +378,7 @@ PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers 
 
 	this->workers = workers;
 	workersDone = false;
+	callbackFoundNewMinimum = 0;
 	
 	chunkSize = 1;
 	paramBounds = &(workers.front()->getParameterBounds());
@@ -427,3 +428,8 @@ void PAO::MasterOptimizer::waitForStartSignal()
 	std::unique_lock<std::mutex> lock(inmutex);
 	waitForStartSignal(lock);
 }
+
+void PAO::MasterOptimizer::setCallbackNewMinimum( void(*fun)(double, double) )
+{
+	callbackFoundNewMinimum=fun;
+};

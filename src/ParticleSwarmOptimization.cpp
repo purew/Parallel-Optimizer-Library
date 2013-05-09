@@ -23,8 +23,7 @@
 
 double PAO::ParticleSwarmOptimizer::optimize()
 {
-	double inertia=1;
-
+	std::cout << "Optimizing " << paramBounds->size() << " dimensions"<<std::endl;
 	std::cout << "Starting PSO with "<<pso.particleCount<<" particles and "<<pso.generations<<" generations.\n";
 	switch (pso.variant)
 	{
@@ -40,6 +39,7 @@ double PAO::ParticleSwarmOptimizer::optimize()
 	unsigned params = paramBounds->size();
 	std::vector<SwarmParticle> allParticles;
 	allParticles.reserve(pso.particleCount);
+	double inertia=1;
 
 	// Set up random starting positions
 	for (unsigned i=0; i<pso.particleCount; ++i)
@@ -55,7 +55,7 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			particle.x.parameters.push_back( newVal );
 
 			// Set up initial velocity
-			newVal = randomBetween(0,1)/100 * (max-min)+min;
+			newVal = randomBetween(0,1)/100 * (max-min)+min; // Todo: look over v_begin
 			particle.v.push_back( newVal );
 		}
 		particle.x.fitnessValue =  std::numeric_limits<double>::max();
@@ -78,7 +78,9 @@ double PAO::ParticleSwarmOptimizer::optimize()
 
 	bestParameters.fitnessValue = std::numeric_limits<double>::max();
 	bestParameters.parameters = allParticles.back().x.parameters;
-	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
+
+	//std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
+
 
 	timespec clockStarted;
 	clock_gettime(CLOCK_REALTIME,&clockStarted);
@@ -148,7 +150,6 @@ double PAO::ParticleSwarmOptimizer::optimize()
 					newPos = paramBounds->min[j];
 				if (newPos > paramBounds->max[j])
 					newPos = paramBounds->max[j];
-
 				allParticles[i].x.parameters[j] = newPos;
 			}
 		}
@@ -181,7 +182,11 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			if ( allParticles[part].x.fitnessValue < bestParameters.fitnessValue )
 			{
 				bestParameters = allParticles[part].x;
-			//	std::cout << "Generation "<<generation<<": Best fitness value "<<bestParameters.fitnessValue<< std::endl;
+				//std::cout << "Generation "<<generation<<": Best fitness value "<<bestParameters.fitnessValue<< std::endl;
+
+				if (callbackFoundNewMinimum!=0)
+					callbackFoundNewMinimum(bestParameters.fitnessValue, generation/(double)pso.generations);
+
 			}
 		}
 	}
