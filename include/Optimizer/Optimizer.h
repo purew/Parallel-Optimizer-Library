@@ -8,7 +8,7 @@ good solutions to a multi-dimensional problem where exhaustive search
 is infeasible due to the large search-space.
 
 It is implemented using C++11 and its native multithreading capabilities.
-My plans are to also implement OpenMPI which would make this library
+My plan is to also implement OpenMPI which would make this library
 far more useful for computer clusters.
 
 It is evolving and the API should not be considered final in any way yet.
@@ -32,7 +32,7 @@ Example
 =======
 
 There is an example implementation of the Rosenbrock-problem in 
-example/rosenbrock.cpp which is built with CMake using
+example/rosenbrock.cpp. Build the example code with CMake using
 
 	mkdir Debug
 	cd Debug

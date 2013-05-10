@@ -1,8 +1,8 @@
 
 #include <atomic>
 
-#include "Optimizer.h"
-#include "ParticleSwarmOptimization.h"
+#include "Optimizer/Optimizer.h"
+#include "Optimizer/ParticleSwarmOptimization.h"
 
 #include "Statistics.h"
 

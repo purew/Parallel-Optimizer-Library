@@ -1,7 +1,7 @@
 
 
-#include "Optimizer.h"
-#include "ParticleSwarmOptimization.h"
+#include "Optimizer/Optimizer.h"
+#include "Optimizer/ParticleSwarmOptimization.h"
 
 
 // For this example, we would like to minimize the Rosenbrock function.
