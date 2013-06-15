@@ -71,6 +71,10 @@ int main()
 	// a vector of OptimizationWorkers and the algorithm's parameters.
 	PAO::ParticleSwarmOptimizer PSO( workers, psoparams );
 	
+	// Set a callback for when a new minimum value is found
+	// printNewMinimum(...) is a small function that prints the new value
+	PSO.setCallbackNewMinimum(printNewMinimum);
+	
 	// Now all that remains is to start the optimization.
 	double y = PSO.optimize();	
 	

@@ -32,18 +32,12 @@ Example
 =======
 
 There is an example implementation of the Rosenbrock-problem in 
-example/rosenbrock.cpp. Build the example code with CMake using
+example/rosenbrock.cpp. Build the example code with waf using
 
-	mkdir Debug
-	cd Debug
-	cmake ..
-	make
+	./waf build_release
 
-Or by using the helper-script 
+The compiled binary is found at build/release/rosenbrock
 
-	./runcmake debug 	or
-	./runcmake release
-	
 Documentation
 =============
 
@@ -325,4 +319,8 @@ namespace PAO
 
 	};
 }
+
+/** Simple function that prints current best minimum and progress for use with setCallbackNewMinimum() */
+void printNewMinimum(double y, double progress);
+
 #endif /* OPTIMIZER_H_ */

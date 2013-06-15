@@ -67,7 +67,7 @@ void PAO::OptimizationWorker::startWorker()
 {
 	if (thrd==0)
 	{
-		thrd = new std::thread(startOptimizationWorkerThread, (void*)this);
+		thrd = new std::thread(startOptimizationWorkerThread, this);
 	}
 	else
 		ERROR("thrd!=0");
@@ -433,3 +433,17 @@ void PAO::MasterOptimizer::setCallbackNewMinimum( void(*fun)(double, double) )
 {
 	callbackFoundNewMinimum=fun;
 };
+
+/*****************************************************************
+ *
+ * 					Various
+ *
+ *****************************************************************/
+
+
+
+void printNewMinimum(double y, double progress)
+{
+	printf("Progress: %.1f\t%f\n",progress*100,y);
+}
+
