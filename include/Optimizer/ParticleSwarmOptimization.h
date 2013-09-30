@@ -42,16 +42,18 @@ namespace PAO
 	class PSOParameters
 	{
 	public:
-		PSOParameters() {
-			this->variant = PopulationBest;
-			this->particleCount=1000;
-			this->generations=100;
-			this->c1=0.7;
-			this->c2=0.2;
-		}
+		PSOParameters()
+		:		variant(PopulationBest),
+		 		swarms(10),
+		 		particleCount(1000),
+		 		generations(100),
+		 		c1(0.7),
+		 		c2(0.2)
+		{}
 
 		PSOVariant_t variant;		///< Which type of PSO to use
-		unsigned particleCount;		///< Number of particles to use
+		unsigned swarms;			///< Number of different swarms to generate
+		unsigned particleCount;		///< Number of particles in each swarm
 		unsigned generations;		///< Number of generations (steps) to perform
 		double c1;					///< Influence of previous local best particle position
 		double c2;					///< Influence of population or neighborhood best particle position
@@ -88,6 +90,9 @@ namespace PAO
 		double optimize();
 
 	private:
+		
+
+
 		PSOParameters pso;
 	};
 

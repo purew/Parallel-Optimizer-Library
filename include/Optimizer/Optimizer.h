@@ -3,17 +3,18 @@
 Introduction
 ============
 
+Parallel Optimizer Library searches for the *X* that minimizes *f(X)*,
+preferably by using evolutionary algorithms and multithreading capabilities.
+
 This library was created when I found myself needing a way of finding 
 good solutions to a multi-dimensional problem where exhaustive search
 is infeasible due to the large search-space.
 
-It is implemented using C++11 and its native multithreading capabilities.
-My plan is to also implement OpenMPI which would make this library
+It is implemented using *C++11* and its native multithreading capabilities.
+My plan is to also implement *MPI* which would make this library
 far more useful for computer clusters.
 
-It is evolving and the API should not be considered final in any way yet.
-However, I have been using this library for my own application since early 2012
-and I am so far confident in the library's function.
+The library is evolving and the API should not be considered final in any way yet. However, I have been using this library for my own application since early 2012 and I am so far confident in the library's function.
 
 How to use
 ==========

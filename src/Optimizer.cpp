@@ -444,6 +444,6 @@ void PAO::MasterOptimizer::setCallbackNewMinimum( void(*fun)(double, double) )
 
 void printNewMinimum(double y, double progress)
 {
-	printf("Progress: %.1f\t%f\n",progress*100,y);
+	printf("Progress: %.1f%%\tnew min:%f\n",progress*100,y);
 }
 
