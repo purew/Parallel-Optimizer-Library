@@ -25,8 +25,7 @@ double PAO::ParticleSwarmOptimizer::optimize()
 {
 	std::cout << "Optimizing " << paramBounds->size() << " dimensions"<<std::endl;
 	std::cout << "Starting PSO with "<<pso.swarms<<" swarms with "<<pso.particleCount<<" particles in each and "<<pso.generations<<" generations.\n";
-	switch (pso.variant)
-	{
+	switch (pso.variant) {
 	case PopulationBest:
 		std::cout << "Using population best variant\n";
 		break;
@@ -38,8 +37,7 @@ double PAO::ParticleSwarmOptimizer::optimize()
 
 	bestParameters.fitnessValue = std::numeric_limits<double>::max();
 
-	for (unsigned swarm=0;swarm<pso.swarms; ++swarm)
-	{
+	for (unsigned swarm=0;swarm<pso.swarms; ++swarm) {
 		std::cout << "Initiating swarm "<<swarm+1<< " of "<<pso.swarms<<std::endl;
 		unsigned params = paramBounds->size();
 		std::vector<SwarmParticle> allParticles;
@@ -50,9 +48,7 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		for (unsigned i=0; i<pso.particleCount; ++i)
 		{
 			SwarmParticle particle;
-
-			for (unsigned param=0; param<params; ++param)
-			{
+			for (unsigned param=0; param<params; ++param) {
 				// Set up initial position
 				double min = paramBounds->min[param];
 				double max = paramBounds->max[param];
@@ -65,11 +61,9 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			}
 			particle.x.fitnessValue =  std::numeric_limits<double>::max();
 			particle.p = particle.x;
-
 			allParticles.push_back(particle);
 
-			if (pso.variant == NeighborhoodBest)
-			{
+			if (pso.variant == NeighborhoodBest) {
 				allParticles.back().l = &(allParticles.back().x);
 				//std::cout <<  "Setting particle.l to "<< &(particle.x)<<""<< std::endl;
 			}
@@ -89,25 +83,20 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		clock_gettime(CLOCK_REALTIME,&clockStarted);
 
 		// Start main swarm loop
-		for (unsigned generation=0; generation<pso.generations;++generation)
-		{
-			if (pso.variant == NeighborhoodBest)
-			{
-				for (unsigned i=0; i < allParticles.size(); ++i)
-				{
+		for (unsigned generation=0; generation<pso.generations;++generation) {
+			if (pso.variant == NeighborhoodBest) {
+				for (unsigned i=0; i < allParticles.size(); ++i) {
 					// Update neighborhood best location
 
 					// Use ring topology
 					unsigned prev = (i-1+allParticles.size())%allParticles.size();
 					unsigned next = (i+1+allParticles.size())%allParticles.size();
-					if ( allParticles[next].p.fitnessValue < allParticles[i].p.fitnessValue )
-					{
+					if ( allParticles[next].p.fitnessValue < allParticles[i].p.fitnessValue ) {
 						allParticles[i].l = &(allParticles[next].p);
 						//std::cout << "Particle "<<i<<" found new neighborhood max "<<allParticles[i].l->fitnessValue <<std::endl;
 						//std::cout.flush();
 					}
-					if ( allParticles[prev].p.fitnessValue < allParticles[i].p.fitnessValue )
-					{
+					if ( allParticles[prev].p.fitnessValue < allParticles[i].p.fitnessValue ) {
 						allParticles[i].l = &(allParticles[prev].p);
 						//std::cout << "Particle "<<i<<" found new neighborhood max "<<allParticles[i].l->fitnessValue <<std::endl;
 						//std::cout.flush();
@@ -118,12 +107,9 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			double c1=pso.c1,c2=pso.c2;
 
 			// Update particle locations
-			for (unsigned i=0; i<pso.particleCount; ++i)
-			{
-				for (unsigned j=0; j<params; ++j)
-				{
-					switch (pso.variant)
-					{
+			for (unsigned i=0; i<pso.particleCount; ++i) {
+				for (unsigned j=0; j<params; ++j) {
+					switch (pso.variant) {
 					case NeighborhoodBest:
 						allParticles[i].v[j] = allParticles[i].v[j]*inertia
 							+ c1*randomBetween(0,1)*(allParticles[i].p.parameters[j]-allParticles[i].x.parameters[j])
@@ -161,11 +147,9 @@ double PAO::ParticleSwarmOptimizer::optimize()
 			outdataList.clear();
 
 			// Check solutions
-			for (unsigned part=0; part < allParticles.size(); ++part)
-			{
+			for (unsigned part=0; part < allParticles.size(); ++part) {
 				// Update particle's best location
-				if (allParticles[part].x.fitnessValue < allParticles[part].p.fitnessValue )
-				{
+				if (allParticles[part].x.fitnessValue < allParticles[part].p.fitnessValue ) {
 					allParticles[part].p = allParticles[part].x;
 				}
 

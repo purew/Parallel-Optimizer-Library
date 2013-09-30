@@ -45,14 +45,14 @@ private:
 
 int main()
 {
-	int numWorkers = 4;	
+	// Ask the system for number of supported threads
+	int numWorkers = std::thread::hardware_concurrency();	
 	
 	// The optimizer takes a vector of OptimizationWorker*'s as argument
 	// where each worker runs in parallell during optimization.
 	// Here we create that vector:
 	std::vector<PAO::OptimizationWorker*> workers;
-	for (int i=0; i<numWorkers; ++i)
-	{
+	for (int i=0; i<numWorkers; ++i) {
 		Rosenbrock *w = new Rosenbrock;
 		workers.push_back( (PAO::OptimizationWorker*) w );		
 	}

@@ -36,7 +36,7 @@
 
 std::mt19937 generator;
 
-double PAO::randomBetween( double min, double max )
+double PAO::randomBetween( double min, double max ) 
 {
 	return ( ((double)generator())/generator.max() * (max-min) ) + min;
 }
@@ -48,12 +48,11 @@ double PAO::randomBetween( double min, double max )
  *****************************************************************/
 
 
-void PAO::ParameterBounds::registerParameter( double _min, double _max )
+void PAO::ParameterBounds::registerParameter( double _min, double _max ) 
 {
 	min.push_back( _min );
 	max.push_back( _max );
 }
-
 
 /*****************************************************************
  *
@@ -63,19 +62,16 @@ void PAO::ParameterBounds::registerParameter( double _min, double _max )
 
 
 /** Creates a new thread and tries to acquire access to input data from masterOptimizer */
-void PAO::OptimizationWorker::startWorker()
+void PAO::OptimizationWorker::startWorker() 
 {
 	if (thrd==0)
-	{
 		thrd = new std::thread(startOptimizationWorkerThread, this);
-	}
 	else
 		ERROR("thrd!=0");
 }
-void PAO::OptimizationWorker::cancelWorker()
+void PAO::OptimizationWorker::cancelWorker() 
 {
-	if (thrd != 0)
-	{
+	if (thrd != 0) {
 		stop = true;
 		master->notifyWorkers();
 
@@ -88,47 +84,36 @@ void PAO::OptimizationWorker::cancelWorker()
 		WARN("thrd=0");
 }
 
-PAO::OptimizationWorker::OptimizationWorker()
+PAO::OptimizationWorker::OptimizationWorker() 
 {
 	master=0;
 	stop = false;
 	thrd = 0;
 }
 
-PAO::OptimizationWorker::~OptimizationWorker()
+PAO::OptimizationWorker::~OptimizationWorker() 
 {
 }
 
 /** Thread does work in this function until all work is done.
 	 * Responsible for locking/getting input data, starting simulation, and locking/saving output. */
-void PAO::OptimizationWorker::doWork()
+void PAO::OptimizationWorker::doWork() 
 {
-	for (;;)
-	{
+	for (;;) {
 		master->waitForStartSignal();
 
-		for (;;)
-		{
-
+		for (;;) {
 			std::list<OptimizationData*> dataList = master->fetchChunkOfIndata();
-
-			if (dataList.empty())
-			{
+			if (dataList.empty()) {
 				stop=true;
 				break;
 			}
-
 			std::list<OptimizationData*>::iterator it;
-			for (it=dataList.begin(); it!=dataList.end(); ++it)
-			{
+			for (it=dataList.begin(); it!=dataList.end(); ++it) {
 				// Run simulation
 				double result = fitnessFunction((*it)->parameters);
-
 				// Save fitness value
 				(*it)->fitnessValue = result;
-
-				//std::cout << "Param "<< data->params[0] << " gave fitness "<<data->fitnessValue<<std::endl;
-
 			}
 			master->pushToOutdata( dataList );
 		}
@@ -139,14 +124,14 @@ void PAO::OptimizationWorker::doWork()
 }
 
 /** Function used when starting worker in new thread. */
-void* PAO::startOptimizationWorkerThread( void* pOptimizationWorker )
+void* PAO::startOptimizationWorkerThread( void* pOptimizationWorker ) 
 {
 	OptimizationWorker* worker = (OptimizationWorker*) pOptimizationWorker;
 	worker->doWork();
 	return 0;
 }
 
-void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename )
+void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename ) 
 {
 	std::ofstream fout(filename.c_str(),std::ios::out|std::ios::binary);
 	if (fout.is_open()==0)
@@ -157,18 +142,16 @@ void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename )
 	// First write a number specifying number of parameters being saved
 	fout << parameters.size() << std::endl;
 
-	for (unsigned i=0; i<parameters.size(); ++i)
-	{
+	for (unsigned i=0; i<parameters.size(); ++i) 	{
 		fout << parameters[i] << "\t"<< parameterBounds.min[i] <<"\t"<<  parameterBounds.max[i]<<std::endl;
 	}
 	fout.close();
 }
 
-void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
+void PAO::OptimizationWorker::readOptimizationParameters( std::string filename ) 
 {
 	std::ifstream fin(filename.c_str(), std::ios::in|std::ios::binary);
-	if (fin.is_open()==0)
-	{
+	if (fin.is_open()==0) 	{
 		std::cout << "No previous parameters found at "<<filename<<std::endl;
 		return;
 	}
@@ -181,8 +164,7 @@ void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
 	parameterBounds.min.resize(dim, 0);
 	parameterBounds.max.resize(dim, 0);
 
-	for (unsigned i=0; i<dim; ++i)
-	{
+	for (unsigned i=0; i<dim; ++i) 	{
 		fin >> parameters[i] >> parameterBounds.min[i] >> parameterBounds.max[i];
 	}
 }
@@ -194,7 +176,7 @@ void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
  *****************************************************************/
 
 
-void PAO::MasterOptimizer::optimizeRandomSearch()
+void PAO::MasterOptimizer::optimizeRandomSearch() 
 {
 	int steps = 200;
 	int params = paramBounds->size();
@@ -208,16 +190,12 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 
 	inmutex.lock();
 
-	for (int n=0; n<params; ++n)
-	{
-		for (int i=0;i<steps; ++i)
-		{
+	for (int n=0; n<params; ++n) {
+		for (int i=0;i<steps; ++i) {
 			OptimizationData s;
 			s.parameters.clear();
 
-			for (int param=0; param<params; ++param)
-			{
-
+			for (int param=0; param<params; ++param) {
 				double min = paramBounds->min[param];
 				double max = paramBounds->max[param];
 				double newVal = ((rand()%1000)/1000.0) * (max-min)+min;
@@ -236,7 +214,6 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
 	std::cout.flush();
 
-
 	notifyWorkers();
 
 	waitUntilProcessed( allTestableSolutions.size() );
@@ -247,11 +224,8 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 	std::vector<OptimizationData>::iterator it;
 	bestParameters.fitnessValue = -std::numeric_limits<double>::max();
 
-	for (it = allTestableSolutions.begin(); it != allTestableSolutions.end(); ++it)
-	{
-		//std::cout << "Fitness " << (*it).fitnessValue << std::endl;
-		if ( (*it).fitnessValue > bestParameters.fitnessValue )
-		{
+	for (it = allTestableSolutions.begin(); it != allTestableSolutions.end(); ++it) {
+		if ( (*it).fitnessValue > bestParameters.fitnessValue ) {
 			bestParameters = *it;
 			std::cout << "Best fitness value "<<bestParameters.fitnessValue<< std::endl;
 		}
@@ -286,24 +260,15 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 	int i=0;
 	double newVal=0;
 	double max,min;
-	for (int param=0; param<params; ++param)
-	{
-		do
-		{
+	for (int param=0; param<params; ++param) {
+		do {
 			min = paramBounds->min[param];
 			max = paramBounds->max[param];
-
 			allTestableSolutions[i].parameters[param] = newVal;
-
-
-			//std::cout << "i="<<i<<", newVal="<<newVal<<", param="<<param<<std::endl;
-
 			indataList.push_front( &(allTestableSolutions[i]) );
 			i += 1;
 			if (i>=N)
 				break;
-				//throw myException("i>N",__FILE__,__LINE__);
-			// Use the previous solution as template
 			allTestableSolutions.push_back( allTestableSolutions[i-1] );
 
 			newVal = allTestableSolutions[i].parameters[param] + (max-min)/(steps-2);
@@ -318,10 +283,8 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 
 	// All parameters tested, load the best parameters found
 	std::vector<OptimizationData>::iterator it;
-	for (it = allTestableSolutions.begin(); it != allTestableSolutions.end(); ++it)
-	{
-		if ( (*it).fitnessValue > bestParameters.fitnessValue )
-		{
+	for (it = allTestableSolutions.begin(); it != allTestableSolutions.end(); ++it) {
+		if ( (*it).fitnessValue > bestParameters.fitnessValue ) {
 			bestParameters = *it;
 			std::cout << "Best parameter was " << bestParameters.parameters[0] << std::endl;
 		}
@@ -330,29 +293,22 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 
 /** Fetch OptimizationData from the input queue.
  * 	The number of items fetched depends on number of threads. */
-std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
+std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata() 
 {
 	std::list<OptimizationData*> fetched;
-
 	std::unique_lock<std::mutex> lock(inmutex);
 	waitForStartSignal(lock);
-
 	//fetched.reserve(chunkSize);
 	unsigned indataSize = indataList.size();
-
-	for ( unsigned i=0; i < indataSize && i < chunkSize; ++i )
-	{
+	for ( unsigned i=0; i < indataSize && i < chunkSize; ++i ) {
 		OptimizationData* indata = indataList.front();
 		indataList.pop_front();
 		fetched.push_back(indata);
 	}
-
-	//else
-	//	ERROR("wait_for() timed out");
 	return fetched;
 }
 
-void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
+void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data ) 
 {
 	outmutex.lock();
 	std::list<OptimizationData*>::iterator it = outdataList.end();
@@ -364,33 +320,24 @@ void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
 }
 
 /** Block until all data scheduled for computation have been computed. */
-void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess )
+void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess ) 
 {
 	std::unique_lock<std::mutex> lock(outmutex);
 	outdataReady.wait(lock, [&] {
 		return (itemsToProcess == outdataList.size()) ; });
 }
 
-PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers )
+PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers ) 
 {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	generator.seed(seed);
-
 	this->workers = workers;
 	workersDone = false;
-	callbackFoundNewMinimum = 0;
-	
+	callbackFoundNewMinimum = 0;	
 	chunkSize = 1;
 	paramBounds = &(workers.front()->getParameterBounds());
 	if (paramBounds->size()<=0)
 		ERROR("Please set appropriate parameter-bounds.\nParameterBounds->size<=0");
-
-	// Find number of cores
-	/*if (maxThreads>0)
-		threadCount = maxThreads;
-	else
-		threadCount =  sysconf( _SC_NPROCESSORS_ONLN );
-		*/
 	
 	std::cout << "\nMasterOptimizer: Using "<< workers.size() << " threads.\n";
 
@@ -405,9 +352,7 @@ PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers 
 PAO::MasterOptimizer::~MasterOptimizer()
 {
 	for (unsigned i=0; i<workers.size(); ++i)
-	{
 		workers[i]->cancelWorker();
-	}
 }
 
 /** Unlock indata queue so that worker threads may start computations */
@@ -439,8 +384,6 @@ void PAO::MasterOptimizer::setCallbackNewMinimum( void(*fun)(double, double) )
  * 					Various
  *
  *****************************************************************/
-
-
 
 void printNewMinimum(double y, double progress)
 {
