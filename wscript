@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2005-2010
+# Build-script for Parallell Optimizer Library
 
-"""
-"""
 
 # the following two variables are used by the target "waf dist"
 VERSION='0.0.1'
@@ -57,7 +55,10 @@ def build(bld):
 		use='pao')
 	
 	# Generate README.md for Github
-	docrule = bld(rule='sed -e \'/END OF DOCUMENTATION/,$$d\' ${SRC} | tail -n +2 > ${TGT}',source='include/Optimizer/Optimizer.h', target='README.md')
+	bld(
+		rule='sed -e \'/END OF DOCUMENTATION/,$$d\' ${SRC} | tail -n +2 > ${TGT}',
+		source='include/Optimizer/Optimizer.h', 
+		target='README.md')
 
 
 from waflib.Build import BuildContext, CleanContext, \

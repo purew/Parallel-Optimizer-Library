@@ -53,7 +53,6 @@ Todo
 - Auto-tuning of PSO-swarm.
 - Exhaustive search for reference.
 - Add regression tests
-- Implement a way for user to disable and/or customize what library prints to stdout.
 
  
 LICENSE
@@ -112,7 +111,6 @@ namespace PAO
 
 	/** Return a random number in (min,max) */
 	double randomBetween( double min, double max );
-
 
 	/*****************************************************************
 	 *

@@ -60,9 +60,9 @@ int main()
 	// Here we specify some parameters for the particle swarm
 	// optimization algorithm.
 	PAO::PSOParameters psoparams;
-	psoparams.swarms = 3;
-	psoparams.particleCount = 1000;
-	psoparams.generations = 100;
+	psoparams.swarms = 10;
+	psoparams.particleCount = 10;
+	psoparams.generations = 1000;
 	psoparams.variant = PAO::NeighborhoodBest;
 	
 	// When instantiating a ParticleSwarmOptimzer, we supply 

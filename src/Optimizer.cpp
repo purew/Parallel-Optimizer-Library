@@ -139,13 +139,22 @@ void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename )
 	else
 		WARN("Saving to "<<filename)
 
-	// First write a number specifying number of parameters being saved
+	fout 	<< "# First line specifies number of parameters.\n"
+			<< "# The following lines contain the actual values\n";
 	fout << parameters.size() << std::endl;
 
 	for (unsigned i=0; i<parameters.size(); ++i) 	{
 		fout << parameters[i] << "\t"<< parameterBounds.min[i] <<"\t"<<  parameterBounds.max[i]<<std::endl;
 	}
 	fout.close();
+}
+
+void removeComments(std::ifstream &fin)
+{
+	while (fin.peek() == '#') {
+		std::string str;
+		std::getline(fin,str);
+	}
 }
 
 void PAO::OptimizationWorker::readOptimizationParameters( std::string filename ) 
@@ -156,6 +165,7 @@ void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
 		return;
 	}
 
+	removeComments(fin);
 	unsigned dim;
 	fin >> dim;
 
@@ -165,6 +175,7 @@ void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
 	parameterBounds.max.resize(dim, 0);
 
 	for (unsigned i=0; i<dim; ++i) 	{
+		removeComments(fin);
 		fin >> parameters[i] >> parameterBounds.min[i] >> parameterBounds.max[i];
 	}
 }

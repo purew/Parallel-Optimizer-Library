@@ -159,14 +159,6 @@ void normalizeAndBound(std::vector<T>& in, int t, std::vector<T>& out, T min=-1,
 	}
 };
 
-template <class T>
-std::vector<T> normalizeAndBound(std::vector<T>& in, int t, T min=-1,T max=1 )
-{
-	std::vector<T> out;
-	normalizeAndBound(in, t, out, min,max);
-	return out;
-}
-
 
 template <class T>
 void getRSI(std::vector<T>& in, int N, std::vector<T>& out )

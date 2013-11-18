@@ -33,12 +33,13 @@ double PAO::ParticleSwarmOptimizer::optimize()
 		std::cout << "Using neighborhood best variant\n";
 		break;
 	}
-	std::cout << "Using PSO:c1="<<pso.c1<<", PSO:c2="<<pso.c2<<std::endl;
-
 	bestParameters.fitnessValue = std::numeric_limits<double>::max();
 
 	for (unsigned swarm=0;swarm<pso.swarms; ++swarm) {
 		std::cout << "Initiating swarm "<<swarm+1<< " of "<<pso.swarms<<std::endl;
+		pso.c1 = randomBetween(0.1,0.9);
+		pso.c2 = randomBetween(0.1,0.9);
+		std::cout << "Using PSO:c1="<<pso.c1<<", PSO:c2="<<pso.c2<<std::endl;
 		unsigned params = paramBounds->size();
 		std::vector<SwarmParticle> allParticles;
 		allParticles.reserve(pso.particleCount);
