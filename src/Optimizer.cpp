@@ -36,7 +36,7 @@
 
 std::mt19937 generator;
 
-double PAO::randomBetween( double min, double max ) 
+double PAO::randomBetween( double min, double max )
 {
 	return ( ((double)generator())/generator.max() * (max-min) ) + min;
 }
@@ -48,7 +48,7 @@ double PAO::randomBetween( double min, double max )
  *****************************************************************/
 
 
-void PAO::ParameterBounds::registerParameter( double _min, double _max ) 
+void PAO::ParameterBounds::registerParameter( double _min, double _max )
 {
 	min.push_back( _min );
 	max.push_back( _max );
@@ -62,14 +62,14 @@ void PAO::ParameterBounds::registerParameter( double _min, double _max )
 
 
 /** Creates a new thread and tries to acquire access to input data from masterOptimizer */
-void PAO::OptimizationWorker::startWorker() 
+void PAO::OptimizationWorker::startWorker()
 {
 	if (thrd==0)
 		thrd = new std::thread(startOptimizationWorkerThread, this);
 	else
 		ERROR("thrd!=0");
 }
-void PAO::OptimizationWorker::cancelWorker() 
+void PAO::OptimizationWorker::cancelWorker()
 {
 	if (thrd != 0) {
 		stop = true;
@@ -84,20 +84,20 @@ void PAO::OptimizationWorker::cancelWorker()
 		WARN("thrd=0");
 }
 
-PAO::OptimizationWorker::OptimizationWorker() 
+PAO::OptimizationWorker::OptimizationWorker()
 {
 	master=0;
 	stop = false;
 	thrd = 0;
 }
 
-PAO::OptimizationWorker::~OptimizationWorker() 
+PAO::OptimizationWorker::~OptimizationWorker()
 {
 }
 
 /** Thread does work in this function until all work is done.
 	 * Responsible for locking/getting input data, starting simulation, and locking/saving output. */
-void PAO::OptimizationWorker::doWork() 
+void PAO::OptimizationWorker::doWork()
 {
 	for (;;) {
 		master->waitForStartSignal();
@@ -124,14 +124,14 @@ void PAO::OptimizationWorker::doWork()
 }
 
 /** Function used when starting worker in new thread. */
-void* PAO::startOptimizationWorkerThread( void* pOptimizationWorker ) 
+void* PAO::startOptimizationWorkerThread( void* pOptimizationWorker )
 {
 	OptimizationWorker* worker = (OptimizationWorker*) pOptimizationWorker;
 	worker->doWork();
 	return 0;
 }
 
-void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename ) 
+void PAO::OptimizationWorker::saveOptimizationParameters( std::string filename )
 {
 	std::ofstream fout(filename.c_str(),std::ios::out|std::ios::binary);
 	if (fout.is_open()==0)
@@ -157,7 +157,7 @@ void removeComments(std::ifstream &fin)
 	}
 }
 
-void PAO::OptimizationWorker::readOptimizationParameters( std::string filename ) 
+void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
 {
 	std::ifstream fin(filename.c_str(), std::ios::in|std::ios::binary);
 	if (fin.is_open()==0) 	{
@@ -187,7 +187,7 @@ void PAO::OptimizationWorker::readOptimizationParameters( std::string filename )
  *****************************************************************/
 
 
-void PAO::MasterOptimizer::optimizeRandomSearch() 
+void PAO::MasterOptimizer::optimizeRandomSearch()
 {
 	int steps = 200;
 	int params = paramBounds->size();
@@ -222,7 +222,8 @@ void PAO::MasterOptimizer::optimizeRandomSearch()
 
 	chunkSize = allTestableSolutions.size() / workers.size();
 
-	std::cout << "indataList now contains "<<indataList.size() << " elements. Chunksize is "<<chunkSize<<std::endl;
+	std::cout << "indataList now contains "<<indataList.size()
+			  << " elements. Chunksize is "<<chunkSize<<std::endl;
 	std::cout.flush();
 
 	notifyWorkers();
@@ -304,7 +305,7 @@ void PAO::MasterOptimizer::optimizeBruteforce()
 
 /** Fetch OptimizationData from the input queue.
  * 	The number of items fetched depends on number of threads. */
-std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata() 
+std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 {
 	std::list<OptimizationData*> fetched;
 	std::unique_lock<std::mutex> lock(inmutex);
@@ -319,7 +320,7 @@ std::list<PAO::OptimizationData*> PAO::MasterOptimizer::fetchChunkOfIndata()
 	return fetched;
 }
 
-void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data ) 
+void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
 {
 	outmutex.lock();
 	std::list<OptimizationData*>::iterator it = outdataList.end();
@@ -331,30 +332,30 @@ void PAO::MasterOptimizer::pushToOutdata( std::list<OptimizationData*> &data )
 }
 
 /** Block until all data scheduled for computation have been computed. */
-void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess ) 
+void PAO::MasterOptimizer::waitUntilProcessed( unsigned itemsToProcess )
 {
 	std::unique_lock<std::mutex> lock(outmutex);
 	outdataReady.wait(lock, [&] {
 		return (itemsToProcess == outdataList.size()) ; });
 }
 
-PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers ) 
+PAO::MasterOptimizer::MasterOptimizer( std::vector<OptimizationWorker*> workers )
 {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	generator.seed(seed);
 	this->workers = workers;
 	workersDone = false;
-	callbackFoundNewMinimum = 0;	
+	callbackFoundNewMinimum = 0;
 	chunkSize = 1;
 	paramBounds = &(workers.front()->getParameterBounds());
 	if (paramBounds->size()<=0)
 		ERROR("Please set appropriate parameter-bounds.\nParameterBounds->size<=0");
-	
+
 	std::cout << "\nMasterOptimizer: Using "<< workers.size() << " threads.\n";
 
 	// Initialize the worker pool
 	for (unsigned i=0; i<workers.size(); ++i)
-	{		
+	{
 		workers[i]->setMaster(this);
 		workers[i]->startWorker();
 	}

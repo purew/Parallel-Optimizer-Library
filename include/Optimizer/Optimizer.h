@@ -6,7 +6,7 @@ Introduction
 Parallel Optimizer Library searches for the *X* that minimizes *f(X)*,
 preferably by using evolutionary algorithms and multithreading capabilities.
 
-This library was created when I found myself needing a way of finding 
+This library was created when I found myself needing a way of finding
 good solutions to a multi-dimensional problem where exhaustive search
 is infeasible due to the large search-space.
 
@@ -19,7 +19,7 @@ The library is evolving and the API should not be considered final in any way ye
 How to use
 ==========
 
-OptimizationWorker is the entity testing a particular solution. 
+OptimizationWorker is the entity testing a particular solution.
 Therefore, derive your own class from that one, taking care to
 set up your problem in its constructor and to calculate your
 fitness-function in OptimizationWorker.fitnessFunction.
@@ -32,7 +32,7 @@ When done, retrieve best solution with MasterOptimizer.getBestParameters().
 Example
 =======
 
-There is an example implementation of the Rosenbrock-problem in 
+There is an example implementation of the Rosenbrock-problem in
 example/rosenbrock.cpp. Build the example code with waf using
 
 	./waf build_release
@@ -54,7 +54,7 @@ Todo
 - Exhaustive search for reference.
 - Add regression tests
 
- 
+
 LICENSE
 =======
 
@@ -62,22 +62,22 @@ The MIT License (MIT)
 
 Copyright (c) 2013 Anders Bennehag
 
-Permission is hereby granted, free of charge, to any person obtaining 
+Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without 
-limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, 
-and to permit persons to whom the Software is furnished to do so, 
+to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so,
 subject to the following conditions:
 
-The above copyright notice and this permission notice shall be 
+The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
-ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
@@ -136,12 +136,9 @@ namespace PAO
 	private:
 	};
 
-	/** The parameters for fitness-function, or the X in f(X). 
+	/** The parameters for fitness-function, or the X in f(X).
 	 * 	At the moment implemented as an std::vector<double>. */
-	class Parameters : public std::vector<double>
-	{
-
-	};
+	typedef Parameters std::vector<double>;
 
 	/** Structure holding parameters and their corresponding fitness-value*/
 	class OptimizationData
@@ -196,10 +193,10 @@ namespace PAO
 		 * Responsible for locking/getting input data, starting simulation, and locking/saving output. */
 		void doWork();
 
-		/** Save current parameters to file 
+		/** Save current parameters to file
 		 * @param filename Where to save parameters */
 		void saveOptimizationParameters( std::string filename = std::string(LAST_OPTIMIZED_PARAMETERS_FILENAME) );
-		/** Load current parameters from file 
+		/** Load current parameters from file
 		 * @param filename Load parameters from this place */
 		void readOptimizationParameters( std::string filename = std::string(LAST_OPTIMIZED_PARAMETERS_FILENAME) );
 
